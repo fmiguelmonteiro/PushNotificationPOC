@@ -26,16 +26,11 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var registersCollection = database.GetCollection("Registers");
+            var searchTermCollection = database.GetCollection("SearchTerm");
 
             try
             {
-                var a = registersCollection.Insert(
-                    new { 
-                        regId = regId,  
-                        searchTerms = new[] {searchTerm },
-                    }, WriteConcern.Acknowledged);
-
+                searchTermCollection.Update(Query.EQ("searchTerm", searchTerm ), Update.AddToSet("regIds", regId), UpdateFlags.Upsert);
                 return 0;
             }
             catch (Exception e)
@@ -43,16 +38,6 @@ namespace PushNotificationService
                 return -1;
             }
         }
-
-
-        //public void PushNotification(string apiKey, string regId, string message)
-        //{
-        //    var push = new PushSharp.PushBroker();
-        //    push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
-        //    push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId)
-        //                         .WithJson("{\"message\":\"" + message + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
-        //}
-
 
         public List<Message> GetMessages(string searchTerm)
         {
@@ -99,31 +84,35 @@ namespace PushNotificationService
             var server = client.GetServer();
             var database = server.GetDatabase("pushNotification");
 
-            //var registersCollection = database.GetCollection("Registers");
+            var searchTermCollection = database.GetCollection("SearchTerm");
 
-            //try
-            //{
-            //    //var array = new List<string>() { text };
-            //    var array = text.Split(' ').ToList();
-            //    var registers = registersCollection.Find(Query.In("searchTerms", BsonArray.Create(array)));
-            //    foreach (var doc in registers)
-            //    {
-            //        push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
-            //        push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(doc["regId"].ToString())
-            //                             .WithJson("{\"message\":\"" + message + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
-            //        //messages.Add(new Message
-            //        //{
-            //        //    Id = doc["_id"].ToString(),
-            //        //    Text = doc["text"].ToString(),
-            //        //    Title = doc["title"].ToString()
-            //        //});
-            //    }
+            try
+            {
+                //var array = new List<string>() { text };
+                var searchTerms = searchTermCollection.FindAll();
+                foreach (var doc in searchTerms)
+                {
+                    var searchTerm = doc["searchTerm"].ToString();
+                    if (text.Contains(searchTerm))
+                    {
+                        
+                        var regIds = doc["regIds"];
+                        foreach (var regId in regIds.AsBsonArray)
+                        {
+                            push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
+                            push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId.ToString())
+                                                 .WithJson("{\"message\":\"New message for " + searchTerm + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
+                            
+                        }
+                    }
 
-            //}
-            //catch (Exception e)
-            //{
-            //    return -1;
-            //}
+                }
+
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
 
             var messagesCollection = database.GetCollection("Messages");
             try
