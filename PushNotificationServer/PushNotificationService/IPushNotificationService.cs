@@ -36,6 +36,14 @@ namespace PushNotificationService
             UriTemplate = "GetMessages")]
         List<Message> GetMessages(string searchTerm);
 
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "Ab")]
+        void Ab();
+
     }
 
     [DataContract]
