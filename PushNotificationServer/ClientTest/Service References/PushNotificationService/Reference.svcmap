@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="89150de9-b8a0-48c7-a884-4cc480a40ed0" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:54010/PushNotificationService.svc/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="7a4739a9-8220-49ab-b436-3ee64f526787" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="ade46f2b-09c2-4ca2-aa7b-df5643722aa2" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="6df72d54-37c3-44c3-98c7-83d2acf8530d" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="PushNotificationService.xsd" MetadataType="Schema" ID="b8721405-3f6d-4e51-a56e-5e45b1c053a0" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

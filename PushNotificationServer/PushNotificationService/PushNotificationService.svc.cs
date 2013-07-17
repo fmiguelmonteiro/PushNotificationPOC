@@ -10,26 +10,30 @@ using PushSharp.Android;
 using PushSharp.Apple;
 using PushSharp.Core;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
+using MongoDB.Bson;
 
 
 namespace PushNotificationService
 {
     public class PushNotificationService : IPushNotificationService
     {
+        
+
         public int Register(string regId, string searchTerm)
         {
             var client = new MongoClient("mongodb://10.4.0.133");
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var commentCollection = database.GetCollection("Registers");
+            var registersCollection = database.GetCollection("Registers");
 
             try
             {
-                var a = commentCollection.Insert(
+                var a = registersCollection.Insert(
                     new { 
                         regId = regId,  
-                        searchTerm = searchTerm
+                        searchTerms = new[] {searchTerm },
                     }, WriteConcern.Acknowledged);
 
                 return 0;
@@ -52,29 +56,91 @@ namespace PushNotificationService
 
         public List<Message> GetMessages(string searchTerm)
         {
-            return new List<Message>(){
-                new Message(){
-                    Id = 0,
-                    Title = "Batatas",
-                    Text = "Batatas 0"
-                },
-                new Message(){
-                    Id = 1,
-                    Title = "Batatas",
-                    Text = "Batatas 1"
-                },
-                new Message(){
-                    Id = 2,
-                    Title = "Batatas",
-                    Text = "Batatas 2"
-                },
-            };
+            List<Message> messages = new List<Message>();
+
+            var client = new MongoClient("mongodb://10.4.0.133");
+            var server = client.GetServer();
+
+            var database = server.GetDatabase("pushNotification");
+            var messagesCollection = database.GetCollection("Messages");
+
+
+            try
+            {
+                //var push = new PushSharp.PushBroker();
+                //push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
+                //push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId)
+                //                     .WithJson("{\"message\":\"" + message + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
+
+                var modules = messagesCollection.Find(Query.Matches("text", searchTerm));
+                foreach (var doc in modules)
+                {
+                    messages.Add(new Message
+                    {
+                        Id = doc["_id"].ToString(),
+                        Text = doc["text"].ToString(),
+                        Title = doc["title"].ToString()
+                    });
+                }
+
+                return messages;
+            }
+            catch (Exception e)
+            {
+                return messages;
+            }
         }
 
-
-        public void Ab()
+        public int AddMessage(string title, string text)
         {
-            throw new NotImplementedException();
+            var push = new PushSharp.PushBroker();
+
+            var client = new MongoClient("mongodb://10.4.0.133");
+            var server = client.GetServer();
+            var database = server.GetDatabase("pushNotification");
+
+            //var registersCollection = database.GetCollection("Registers");
+
+            //try
+            //{
+            //    //var array = new List<string>() { text };
+            //    var array = text.Split(' ').ToList();
+            //    var registers = registersCollection.Find(Query.In("searchTerms", BsonArray.Create(array)));
+            //    foreach (var doc in registers)
+            //    {
+            //        push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
+            //        push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(doc["regId"].ToString())
+            //                             .WithJson("{\"message\":\"" + message + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
+            //        //messages.Add(new Message
+            //        //{
+            //        //    Id = doc["_id"].ToString(),
+            //        //    Text = doc["text"].ToString(),
+            //        //    Title = doc["title"].ToString()
+            //        //});
+            //    }
+
+            //}
+            //catch (Exception e)
+            //{
+            //    return -1;
+            //}
+
+            var messagesCollection = database.GetCollection("Messages");
+            try
+            {
+                var a = messagesCollection.Insert(
+                    new
+                    {
+                        title = title,
+                        text = text
+                    }, WriteConcern.Acknowledged);
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
         }
     }
 }

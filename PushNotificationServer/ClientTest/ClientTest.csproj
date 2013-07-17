@@ -33,37 +33,40 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\lib\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PushSharp.Amazon.Adm">
-      <HintPath>..\packages\PushSharp.Amazon.Adm.dll</HintPath>
+      <HintPath>..\lib\PushSharp.Amazon.Adm.dll</HintPath>
     </Reference>
-    <Reference Include="PushSharp.Android, Version=2.1.1.0, Culture=neutral, PublicKeyToken=cf74b75eab2c0170, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PushSharp.Android.dll</HintPath>
+    <Reference Include="PushSharp.Android">
+      <HintPath>..\lib\PushSharp.Android.dll</HintPath>
     </Reference>
-    <Reference Include="PushSharp.Apple, Version=2.1.1.0, Culture=neutral, PublicKeyToken=cf74b75eab2c0170, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PushSharp.Apple.dll</HintPath>
+    <Reference Include="PushSharp.Apple">
+      <HintPath>..\lib\PushSharp.Apple.dll</HintPath>
     </Reference>
-    <Reference Include="PushSharp.Blackberry, Version=2.1.1.0, Culture=neutral, PublicKeyToken=cf74b75eab2c0170, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PushSharp.Blackberry.dll</HintPath>
+    <Reference Include="PushSharp.Blackberry">
+      <HintPath>..\lib\PushSharp.Blackberry.dll</HintPath>
     </Reference>
-    <Reference Include="PushSharp.Core, Version=2.1.1.0, Culture=neutral, PublicKeyToken=cf74b75eab2c0170, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PushSharp.Core.dll</HintPath>
+    <Reference Include="PushSharp.Core">
+      <HintPath>..\lib\PushSharp.Core.dll</HintPath>
     </Reference>
-    <Reference Include="PushSharp.Windows, Version=2.1.1.0, Culture=neutral, PublicKeyToken=cf74b75eab2c0170, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PushSharp.Windows.dll</HintPath>
+    <Reference Include="PushSharp.Windows">
+      <HintPath>..\lib\PushSharp.Windows.dll</HintPath>
     </Reference>
     <Reference Include="PushSharp.WindowsPhone">
-      <HintPath>..\packages\PushSharp.WindowsPhone.dll</HintPath>
+      <HintPath>..\lib\PushSharp.WindowsPhone.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -82,6 +85,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\PushNotificationService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -94,6 +102,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -103,6 +112,37 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Service References\PushNotificationService\ClientTest.PushNotificationService.Message.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\PushNotificationService\PushNotificationService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\PushNotificationService\service.wsdl" />
+    <None Include="Service References\PushNotificationService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\PushNotificationService\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\PushNotificationService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\PushNotificationService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\PushNotificationService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\PushNotificationService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
