@@ -16,7 +16,9 @@
 package com.google.android.gcm.demo.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -24,13 +26,29 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.http.*;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 /**
  * Main UI for the demo app.
@@ -54,7 +72,7 @@ public class DemoActivity extends Activity {
     /**
      * Tag used on log messages.
      */
-    static final String TAG = "GCMDemo";
+    static final String TAG = "GCMPOC";
 
     TextView mDisplay;
     GoogleCloudMessaging gcm;
@@ -68,17 +86,89 @@ public class DemoActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
-        mDisplay = (TextView) findViewById(R.id.display);
+ //       mDisplay = (TextView) findViewById(R.id.display);
 
         context = getApplicationContext();
         regid = getRegistrationId(context);
         
-        Log.v(TAG, "ID " + regid);
+        Log.v(TAG, "ID " + regid);        
+        
+        currentTopics();
+    
+ 		Button regbtn = (Button) findViewById(R.id.Add);
 
+ 		regbtn.setOnClickListener(new View.OnClickListener() {
+ 			@Override
+ 			public void onClick(View v) {
+ 				searchRequest();
+ 			}
+ 		});
+        
+        
         if (regid.length() == 0) {
             registerBackground();
         }
         gcm = GoogleCloudMessaging.getInstance(this);
+    }
+    
+    private void currentTopics() {
+		// TODO Auto-generated method stub
+    	final ListView listview = (ListView) findViewById(R.id.listView1);
+    	
+    	//get TOPICS!
+        String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
+            "Blackberry", "WebOS" };
+        ////
+        
+        final ArrayList<String> list = new ArrayList<String>();
+        for (int i = 0; i < values.length; ++i) {
+          list.add(values[i]);
+        }
+        
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, list);
+        
+        listview.setAdapter(adapter);        
+        
+        listview.setOnItemClickListener(new OnItemClickListener()
+        {
+		        public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
+		        {      
+		        	Intent mIntent = new Intent(DemoActivity.this, TopicFeedActivity.class);
+		        	
+		        	mIntent.putExtra("FeedName", listview.getItemAtPosition(position).toString()); 
+		        	
+		        	startActivity(mIntent);
+                }
+         });
+	}
+
+	private void searchRequest(){
+    	EditText editText = (EditText)findViewById(R.id.editText1);
+
+    	String editTextStr = editText.getText().toString();
+    	
+        final SharedPreferences prefs = getGCMPreferences(context);
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+
+        /*HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://www.yoursite.com/script.php");
+
+        try {
+            // Add your data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
+            nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+            
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+        }*/
     }
 
     /**
@@ -170,7 +260,7 @@ public class DemoActivity extends Activity {
     }
 
     public void onClick(final View view) {
-        if (view == findViewById(R.id.send)) {
+       /* if (view == findViewById(R.id.send)) {
             new AsyncTask<Void, Void, String>() {
                 @Override
                 protected String doInBackground(Void... params) {
@@ -194,7 +284,7 @@ public class DemoActivity extends Activity {
             }.execute(null, null, null);
         } else if (view == findViewById(R.id.clear)) {
             mDisplay.setText("");
-        } 
+        } */
     }
 
     @Override
