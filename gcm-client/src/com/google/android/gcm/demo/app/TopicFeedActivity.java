@@ -49,7 +49,7 @@ public class TopicFeedActivity extends Activity {
 	
 	/* Menu Code */
 	
-	public boolean onCreateOptionsMenu(Menu menu) {
+	/*public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.topicfeedmenu, menu);
 	    return true;
@@ -70,7 +70,7 @@ public class TopicFeedActivity extends Activity {
 		    return super.onOptionsItemSelected(item);
 		}
 		
-	}
+	}*/
 	
 	private void removeTopic() {
 		String topic = getIntent().getExtras().getString("FeedName");

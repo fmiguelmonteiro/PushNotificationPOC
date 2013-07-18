@@ -26,8 +26,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -110,16 +113,34 @@ public class DemoActivity extends Activity {
         
         LoadList();
     
- 		Button regbtn = (Button) findViewById(R.id.Add);
+ 		final Button regbtn = (Button) findViewById(R.id.Add);
+ 		final EditText editText = (EditText)findViewById(R.id.editText1);		
 
  		regbtn.setOnClickListener(new View.OnClickListener() {
  			@Override
  			public void onClick(View v) {
  				searchRequest();
  				LoadList();
+ 				editText.setText("");
  			}
- 		});
-        
+ 		});		 		
+ 		
+ 		regbtn.setEnabled(false);
+    	 		
+ 		editText.addTextChangedListener(new TextWatcher() {
+
+ 		    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+ 		    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+ 		    public void afterTextChanged(Editable s) {
+ 		        if (s == null || s.length() == 0) {
+ 		        	regbtn.setEnabled(false);
+ 		        }
+ 		        else {
+ 		        	regbtn.setEnabled(true);
+ 		        }
+ 		    }
+ 		});        
         
         if (regid.length() == 0) {
             registerBackground();
