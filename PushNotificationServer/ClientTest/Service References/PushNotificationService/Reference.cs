@@ -15,6 +15,83 @@ namespace ClientTest.PushNotificationService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Topic", Namespace="http://schemas.datacontract.org/2004/07/PushNotificationService")]
+    [System.SerializableAttribute()]
+    public partial class Topic : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string IdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NumberOfSubscribersField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Id {
+            get {
+                return this.IdField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.IdField, value) != true)) {
+                    this.IdField = value;
+                    this.RaisePropertyChanged("Id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string NumberOfSubscribers {
+            get {
+                return this.NumberOfSubscribersField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NumberOfSubscribersField, value) != true)) {
+                    this.NumberOfSubscribersField = value;
+                    this.RaisePropertyChanged("NumberOfSubscribers");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Message", Namespace="http://schemas.datacontract.org/2004/07/PushNotificationService")]
     [System.SerializableAttribute()]
     public partial class Message : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -30,6 +107,9 @@ namespace ClientTest.PushNotificationService {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string TitleField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string UrlField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -80,6 +160,19 @@ namespace ClientTest.PushNotificationService {
             }
         }
         
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Url {
+            get {
+                return this.UrlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UrlField, value) != true)) {
+                    this.UrlField = value;
+                    this.RaisePropertyChanged("Url");
+                }
+            }
+        }
+        
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
         protected void RaisePropertyChanged(string propertyName) {
@@ -97,11 +190,20 @@ namespace ClientTest.PushNotificationService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPushNotificationService/Register", ReplyAction="http://tempuri.org/IPushNotificationService/RegisterResponse")]
         int Register(string regId, string searchTerm);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPushNotificationService/GetSubscribedTopics", ReplyAction="http://tempuri.org/IPushNotificationService/GetSubscribedTopicsResponse")]
+        string[] GetSubscribedTopics(string regId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPushNotificationService/GetAllTopics", ReplyAction="http://tempuri.org/IPushNotificationService/GetAllTopicsResponse")]
+        string[] GetAllTopics();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPushNotificationService/GetPopularTopics", ReplyAction="http://tempuri.org/IPushNotificationService/GetPopularTopicsResponse")]
+        ClientTest.PushNotificationService.Topic[] GetPopularTopics(int top, bool ascending);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPushNotificationService/GetMessages", ReplyAction="http://tempuri.org/IPushNotificationService/GetMessagesResponse")]
         ClientTest.PushNotificationService.Message[] GetMessages(string searchTerm);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPushNotificationService/AddMessage", ReplyAction="http://tempuri.org/IPushNotificationService/AddMessageResponse")]
-        int AddMessage(string title, string text);
+        int AddMessage(string title, string text, string url);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -135,12 +237,24 @@ namespace ClientTest.PushNotificationService {
             return base.Channel.Register(regId, searchTerm);
         }
         
+        public string[] GetSubscribedTopics(string regId) {
+            return base.Channel.GetSubscribedTopics(regId);
+        }
+        
+        public string[] GetAllTopics() {
+            return base.Channel.GetAllTopics();
+        }
+        
+        public ClientTest.PushNotificationService.Topic[] GetPopularTopics(int top, bool ascending) {
+            return base.Channel.GetPopularTopics(top, ascending);
+        }
+        
         public ClientTest.PushNotificationService.Message[] GetMessages(string searchTerm) {
             return base.Channel.GetMessages(searchTerm);
         }
         
-        public int AddMessage(string title, string text) {
-            return base.Channel.AddMessage(title, text);
+        public int AddMessage(string title, string text, string url) {
+            return base.Channel.AddMessage(title, text, url);
         }
     }
 }

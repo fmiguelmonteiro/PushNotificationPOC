@@ -11,6 +11,11 @@ using PushSharp;
 using PushSharp.Android;
 using PushSharp.Apple;
 using PushSharp.Core;
+using System.ServiceModel;
+using System.ServiceModel.Description;
+using ClientTest.PushNotificationService;
+using System.Net;
+using System.Runtime.Serialization.Json;
 
 namespace ClientTest
 {
@@ -23,12 +28,61 @@ namespace ClientTest
 
         private void button1_Click(object sender, EventArgs e)
         {
-            PushNotificationService.PushNotificationServiceClient client = new PushNotificationService.PushNotificationServiceClient();
-            //var push = new PushSharp.PushBroker();
 
-            client.AddMessage(title.Text, text.Text);
+            //string ServiceUri = "http://localhost:58145/PushNotificationService.svc/AddMessage?title="
+            //                     + title.Text;
+            //WebClient proxy = new WebClient();
+            //proxy.co
+            //proxy.DownloadStringCompleted +=
+            //           new DownloadStringCompletedEventHandler(proxy_DownloadStringCompleted);
 
-            client.Close();
+            //proxy.DownloadStringAsync(new Uri(ServiceUri));
+
+        }
+
+        void proxy_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        {
+            Stream stream = new MemoryStream(Encoding.Unicode.GetBytes(e.Result));
+            DataContractJsonSerializer obj = new DataContractJsonSerializer(typeof(string));
+            string result = obj.ReadObject(stream).ToString();
+            MessageBox.Show(result);
+
+            //PushNotificationService.PushNotificationServiceClient client = new PushNotificationService.PushNotificationServiceClient(;
+            ////var push = new PushSharp.PushBroker();
+
+            //client.AddMessage(title.Text, text.Text, "http://www.sapo.pt");
+
+            //client.Close();
+
+            string baseAddress = "http://localhost:58145/PushNotificationService.svc";
+
+            //ServiceHost host = new ServiceHost(typeof(IPushNotificationService), new Uri(baseAddress));
+
+            //ServiceEndpoint endpoint = host.AddServiceEndpoint(typeof(IPushNotificationService), new WebHttpBinding(), "");
+
+            //endpoint.Behaviors.Add(new WebHttpBehavior());
+
+            //host.Open();
+
+            //Console.WriteLine("Host opened");
+
+
+
+            //HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(baseAddress + "/ProcessXml");
+
+            //req.Method = "POST";
+
+            //req.ContentType = "application/xml; charset=utf-8";
+
+            //string reqBody = @"<TextBlock x:Name=""text"" IsHitTestVisible=""false"" Text=""Hello"" Foreground=""black"" xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""/>";
+
+            //byte[] reqBodyBytes = Encoding.UTF8.GetBytes(reqBody);
+
+            //Stream reqStream = req.GetRequestStream();
+
+            //reqStream.Write(reqBodyBytes, 0, reqBodyBytes.Length);
+
+            //reqStream.Close();
 
             //push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
             ////Fluent construction of an Android GCM Notification

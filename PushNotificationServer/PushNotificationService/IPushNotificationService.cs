@@ -93,6 +93,13 @@ namespace PushNotificationService
             get;
             set;
         }
+
+        [DataMember]
+        public DateTime Date
+        {
+            get;
+            set;
+        }
     }
 
     [DataContract]

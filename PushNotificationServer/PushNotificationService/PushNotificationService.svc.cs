@@ -104,6 +104,7 @@ namespace PushNotificationService
             var database = server.GetDatabase("pushNotification");
             var messagesCollection = database.GetCollection("Messages");
 
+            
 
             try
             {
@@ -115,7 +116,8 @@ namespace PushNotificationService
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
                         Title = doc["title"].ToString(),
-                        Url = doc["url"] != null ? doc["url"].ToString() : ""
+                        Url = doc["url"].IsBsonNull ? "" :doc["url"].ToString(),
+                        Date = doc["date"].IsBsonNull ? DateTime.MinValue: DateTime.Parse(doc["date"].ToString())
                     });
                 }
 
