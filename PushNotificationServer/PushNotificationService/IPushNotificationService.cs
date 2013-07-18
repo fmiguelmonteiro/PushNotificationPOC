@@ -95,7 +95,7 @@ namespace PushNotificationService
         }
 
         [DataMember]
-        public DateTime Date
+        public String Date
         {
             get;
             set;

@@ -120,7 +120,7 @@ namespace PushNotificationService
                         Text = doc["text"].ToString(),
                         Title = doc["title"].ToString(),
                         Url = doc["url"].IsBsonNull ? "" :doc["url"].ToString(),
-                        Date = doc["date"].IsBsonNull ? DateTime.MinValue: DateTime.Parse(doc["date"].ToString())
+                        Date = doc["date"].IsBsonNull ? DateTime.MinValue.ToString("yyyy-MM-dd'T'HH:mm:ssz") : DateTime.Parse(doc["date"].ToString()).ToString("yyyy-MM-dd'T'HH:mm:ssz")
                     });
                 }
 
