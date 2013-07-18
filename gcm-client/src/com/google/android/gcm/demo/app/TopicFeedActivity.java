@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpResponse;
 
-import com.google.android.gcm.demo.app.DemoActivity.result;
 import com.google.gson.Gson;
 
 import android.app.Activity;
@@ -147,7 +146,7 @@ public class TopicFeedActivity extends Activity {
         currentTopicFeed(topic);
     }
 
-	private void currentTopicFeed() {
+	private void currentTopicFeed(String topic) {
 		final ListView listview = (ListView) findViewById(R.id.TopicFeedlistView1);
         
         GetMessagesResult messagelist = new GetMessagesResult();

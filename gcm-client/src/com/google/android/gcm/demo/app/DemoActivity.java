@@ -120,7 +120,7 @@ public class DemoActivity extends Activity {
 		    default:
 		    return super.onOptionsItemSelected(item);
 		}
-		
+	}
 
     class result {    	
     	int RegisterResult;
