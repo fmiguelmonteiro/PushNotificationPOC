@@ -41,8 +41,8 @@ namespace PushNotificationService
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
-            UriTemplate = "Ab")]
-        void Ab();
+            UriTemplate = "AddMessage")]
+        int AddMessage(string title, string text);
 
     }
 
@@ -51,7 +51,7 @@ namespace PushNotificationService
     {
 
         [DataMember]
-        public long Id
+        public string Id
         {
             get;
             set;

@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientTest", "ClientTest\ClientTest.csproj", "{DDFE6752-9EF7-4065-9641-2C8A472CBE24}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5CBCB494-D792-4471-8CB6-FC41E378D504} = {5CBCB494-D792-4471-8CB6-FC41E378D504}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PushNotificationService", "PushNotificationService\PushNotificationService.csproj", "{5CBCB494-D792-4471-8CB6-FC41E378D504}"
 EndProject

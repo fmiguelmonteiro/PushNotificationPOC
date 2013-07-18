@@ -6,7 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,7 +29,90 @@ public class TopicFeedActivity extends Activity {
         	description = address;
         }
 	}
-	 
+	
+	/* Menu Code */
+	
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.topicfeedmenu, menu);
+	    return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		    case R.id.about:
+		    //startActivity(new Intent(this, About.class));
+		    return true;
+		    case R.id.help:
+		    //startActivity(new Intent(this, Help.class));
+		    return true;
+		    case R.id.remove:
+			    removeTopic();
+			return true;
+		    default:
+		    return super.onOptionsItemSelected(item);
+		}
+		
+	}
+	
+	private void removeTopic() {
+		String topic = getIntent().getExtras().getString("FeedName");
+		
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				TopicFeedActivity.this);
+ 
+			// set title
+			alertDialogBuilder.setTitle("Are you sure you want to remove this topic?");
+ 
+			// set dialog message
+			alertDialogBuilder
+				.setMessage(topic)
+				.setCancelable(false)
+				.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						// if this button is clicked, close
+						// current activity
+						//MainActivity.this.finish();
+						AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
+								TopicFeedActivity.this);
+						alertDialogBuilderConfirm
+						.setMessage("Topic Removed!")
+						.setCancelable(false)
+						.setNegativeButton("OK",new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,int id) {
+								// if this button is clicked, just close
+								// the dialog box and do nothing
+								dialog.cancel();
+								Intent mIntent = new Intent(TopicFeedActivity.this, DemoActivity.class);
+								mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					        	startActivity(mIntent);
+							}
+						});
+						// create alert dialog
+						AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
+		 
+						// show it
+						alertDialogConfirm.show();
+					}
+				  })
+				  .setNegativeButton("No",new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,int id) {
+						// if this button is clicked, just close
+						// the dialog box and do nothing
+						dialog.cancel();
+					}
+				});
+ 
+				// create alert dialog
+				AlertDialog alertDialog = alertDialogBuilder.create();
+ 
+				// show it
+				alertDialog.show();
+	}
+
+	/*******/
+	
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
