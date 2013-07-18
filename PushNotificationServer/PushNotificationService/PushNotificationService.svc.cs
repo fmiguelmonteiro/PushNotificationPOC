@@ -108,7 +108,10 @@ namespace PushNotificationService
 
             try
             {
-                var modules = messagesCollection.Find(Query.Matches("text", BsonRegularExpression.Create(new Regex(searchTerm, RegexOptions.IgnoreCase))));
+                var modules = messagesCollection.Find(
+                        Query.Matches("text", BsonRegularExpression.Create(new Regex(searchTerm, RegexOptions.IgnoreCase)))
+                    ).SetSortOrder(SortBy.Descending("date"));
+
                 foreach (var doc in modules)
                 {
                     messages.Add(new Message

@@ -16,9 +16,11 @@ using System.ServiceModel.Description;
 using ClientTest.PushNotificationService;
 using System.Net;
 using System.Runtime.Serialization.Json;
+using RestSharp;
 
 namespace ClientTest
 {
+
     public partial class Form1 : Form
     {
         public Form1()
@@ -26,8 +28,34 @@ namespace ClientTest
             InitializeComponent();
         }
 
+        public class AddMessage
+        {
+            public string title { get; set; }
+            public string text { get; set; }
+            public string url { get; set; }
+        }
+
+
         private void button1_Click(object sender, EventArgs e)
         {
+            var client = new RestClient("http://localhost:58145");
+            // client.Authenticator = new HttpBasicAuthenticator(username, password);
+
+            var request = new RestRequest("PushNotificationService.svc/AddMessage", Method.POST);
+
+            request.AddHeader("Content-type", "application/json");
+
+            var model = new AddMessage { title = title.Text, text = text.Text, url = url.Text };
+            //var json = request.JsonSerializer.Serialize(model);
+            request.AddBody(model, "http://tempuri.org/");
+
+            
+
+            // execute the request
+            IRestResponse response = client.Execute(request);
+            var content = response.Content; // raw content as string
+
+            result.Text = content;
 
             //string ServiceUri = "http://localhost:58145/PushNotificationService.svc/AddMessage?title="
             //                     + title.Text;
