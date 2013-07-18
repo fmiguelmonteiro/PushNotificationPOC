@@ -107,7 +107,7 @@ namespace PushNotificationService
                     {
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
-                        Title = doc["title"].ToString()
+                        Title = doc["title"].ToString(),
                         Url = doc["url"] != null ? doc["url"].ToString() : ""
                     });
                 }
