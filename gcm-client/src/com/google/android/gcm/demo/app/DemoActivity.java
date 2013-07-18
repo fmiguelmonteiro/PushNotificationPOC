@@ -39,6 +39,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -149,26 +150,13 @@ public class DemoActivity extends Activity {
     	String editTextStr = editText.getText().toString();
     	
         final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-
-        /*HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://www.yoursite.com/script.php");
-
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-            nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-            
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        }*/
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");       
+        
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put("regId", registrationId);
+        data.put("searchTerm", editTextStr);
+        POSTRequest asyncHttpPost = new POSTRequest(data);
+        asyncHttpPost.execute("http://10.0.2.2:54010/PushNotificationService.svc/Register");
     }
 
     /**
