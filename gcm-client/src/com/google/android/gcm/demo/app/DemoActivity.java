@@ -18,6 +18,7 @@ package com.google.android.gcm.demo.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.FeatureInfo;
@@ -25,11 +26,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -38,12 +42,17 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gcm.demo.app.TopicFeedActivity.GetMessagesResult;
+import com.google.android.gcm.demo.app.TopicFeedActivity.Message;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.*;
@@ -85,6 +94,7 @@ public class DemoActivity extends Activity {
 
     String regid;
     
+
     /* Menu Code */
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -111,6 +121,14 @@ public class DemoActivity extends Activity {
 		    return super.onOptionsItemSelected(item);
 		}
 		
+
+    class result {    	
+    	int RegisterResult;
+    }
+    
+    class GetSubscribedTopicsResult{		
+		List<String> GetSubscribedTopicsResult;
+
 	}
 
     @Override
@@ -125,17 +143,36 @@ public class DemoActivity extends Activity {
         
         Log.v(TAG, "ID " + regid);        
         
-        currentTopics();
+        LoadList();
     
- 		Button regbtn = (Button) findViewById(R.id.Add);
+ 		final Button regbtn = (Button) findViewById(R.id.Add);
+ 		final EditText editText = (EditText)findViewById(R.id.editText1);		
 
  		regbtn.setOnClickListener(new View.OnClickListener() {
  			@Override
  			public void onClick(View v) {
  				searchRequest();
+ 				LoadList();
+ 				editText.setText("");
  			}
- 		});
-        
+ 		});		 		
+ 		
+ 		regbtn.setEnabled(false);
+    	 		
+ 		editText.addTextChangedListener(new TextWatcher() {
+
+ 		    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+ 		    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+ 		    public void afterTextChanged(Editable s) {
+ 		        if (s == null || s.length() == 0) {
+ 		        	regbtn.setEnabled(false);
+ 		        }
+ 		        else {
+ 		        	regbtn.setEnabled(true);
+ 		        }
+ 		    }
+ 		});        
         
         if (regid.length() == 0) {
             registerBackground();
@@ -143,18 +180,33 @@ public class DemoActivity extends Activity {
         gcm = GoogleCloudMessaging.getInstance(this);
     }
     
-    private void currentTopics() {
+    private void LoadList() {
 		// TODO Auto-generated method stub
-    	final ListView listview = (ListView) findViewById(R.id.listView1);
-    	
-    	//get TOPICS!
-        String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-            "Blackberry", "WebOS" };
-        ////
+    	final ListView listview = (ListView) findViewById(R.id.listView1);    	
+    	        
+        final SharedPreferences prefs = getGCMPreferences(context);
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
+        
+        GetSubscribedTopicsResult topiclist = new GetSubscribedTopicsResult();
+        
+        HashMap<String, String> param = new HashMap<String, String>();        
+        param.put("regId", registrationId);
+        POSTRequest asyncHttpPost = new POSTRequest(param);
+        try {
+	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetSubscribedTopics").get();
+			Gson gson = new Gson(); 
+			topiclist = gson.fromJson(str_result, GetSubscribedTopicsResult.class);        
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
         
         final ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; ++i) {
-          list.add(values[i]);
+        for (String topic : topiclist.GetSubscribedTopicsResult){
+          list.add(topic);
         }
         
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
@@ -173,34 +225,56 @@ public class DemoActivity extends Activity {
 		        	startActivity(mIntent);
                 }
          });
-	}
-
+	}   
+    
 	private void searchRequest(){
     	EditText editText = (EditText)findViewById(R.id.editText1);
 
     	String editTextStr = editText.getText().toString();
     	
         final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-
-        /*HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://www.yoursite.com/script.php");
-
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");       
+        
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put("regId", registrationId);
+        data.put("searchTerm", editTextStr);
+        POSTRequest asyncHttpPost = new POSTRequest(data);
         try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-            nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/Register").get();
+			Gson gson = new Gson(); 
+			result i = gson.fromJson(str_result, result.class);
+			
+			AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
+					DemoActivity.this);
+			if(i.RegisterResult == 0){
+				alertDialogBuilderConfirm.setMessage("Topic successfully added!");
+			}else{				
+				alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
+			}
+			
+			alertDialogBuilderConfirm.setCancelable(true);
+			alertDialogBuilderConfirm.setNeutralButton(android.R.string.ok,
+		            new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int id) {
+		            dialog.cancel();
+		        }
+		    });
+			
+			// create alert dialog
+			AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
 
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-            
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-        }*/
+			// show it
+			alertDialogConfirm.show();
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}    
+        
+        
     }
 
     /**

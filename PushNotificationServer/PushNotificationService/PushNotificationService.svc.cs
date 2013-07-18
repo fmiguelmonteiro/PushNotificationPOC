@@ -78,7 +78,7 @@ namespace PushNotificationService
 
             try
             {
-                searchTermCollection.Update(Query.EQ("searchTerm", searchTerm ), Update.AddToSet("regIds", regId), UpdateFlags.Upsert);
+                searchTermCollection.Update(Query.EQ("searchTerm", searchTerm ), Update.AddToSet("regIds", regId).Inc("nOfSubscribers", 1), UpdateFlags.Upsert);
                 return 0;
             }
             catch (Exception e)
@@ -107,7 +107,8 @@ namespace PushNotificationService
                     {
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
-                        Title = doc["title"].ToString()
+                        Title = doc["title"].ToString(),
+                        Url = doc["url"] != null ? doc["url"].ToString() : ""
                     });
                 }
 
@@ -119,7 +120,7 @@ namespace PushNotificationService
             }
         }
 
-        public int AddMessage(string title, string text)
+        public int AddMessage(string title, string text, string url)
         {
             var client = new MongoClient("mongodb://10.4.0.133");
             var server = client.GetServer();
@@ -136,6 +137,7 @@ namespace PushNotificationService
                         title = title,
                         text = text,
                         notified = false,
+                        url = url,
                         date = DateTime.UtcNow
                     }, WriteConcern.Acknowledged);
 
@@ -187,13 +189,50 @@ namespace PushNotificationService
             var database = server.GetDatabase("pushNotification");
             var searchTermCollection = database.GetCollection("SearchTerm");
 
-
             try
             {
                 var result = searchTermCollection.FindAll();
                 foreach (var doc in result)
                 {
                     topics.Add(doc["searchTerm"].ToString());
+                }
+
+                return topics;
+            }
+            catch (Exception e)
+            {
+                return topics;
+            }
+        }
+
+
+        public List<Topic> GetPopularTopics(int top, bool ascending)
+        {
+            List<Topic> topics = new List<Topic>();
+
+            var client = new MongoClient("mongodb://10.4.0.133");
+            var server = client.GetServer();
+
+            var database = server.GetDatabase("pushNotification");
+            var searchTermCollection = database.GetCollection("SearchTerm");
+
+            var sort = SortBy.Ascending("nOfSubscribers");
+            if (!ascending)
+	        {
+                sort = SortBy.Descending("nOfSubscribers");
+	        }
+
+            try
+            {
+                var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(top);
+                foreach (var doc in result)
+                {
+                    topics.Add(new Topic()
+                    {
+                        Name = doc["searchTerm"].ToString(),
+                        NumberOfSubscribers = doc["nOfSubscribers"].ToString(),
+                        Id = doc["_id"].ToString(),
+                    });
                 }
 
                 return topics;
