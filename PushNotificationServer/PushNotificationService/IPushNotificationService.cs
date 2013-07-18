@@ -41,6 +41,14 @@ namespace PushNotificationService
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "GetPopularTopics")]
+        List<Topic> GetPopularTopics(int top);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetMessages")]
         List<Message> GetMessages(string searchTerm);
 
@@ -81,6 +89,32 @@ namespace PushNotificationService
 
         [DataMember]
         public string Url
+        {
+            get;
+            set;
+        }
+    }
+
+    [DataContract]
+    public class Topic
+    {
+
+        [DataMember]
+        public string Id
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public string NumberOfSubscribers
         {
             get;
             set;
