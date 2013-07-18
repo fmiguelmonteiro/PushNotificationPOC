@@ -36,6 +36,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gcm.demo.app.TopicFeedActivity.GetMessagesResult;
+import com.google.android.gcm.demo.app.TopicFeedActivity.Message;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 
@@ -89,6 +91,10 @@ public class DemoActivity extends Activity {
     class result {    	
     	int RegisterResult;
     }
+    
+    class GetSubscribedTopicsResult{		
+		List<String> GetSubscribedTopicsResult;
+	}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,7 +108,7 @@ public class DemoActivity extends Activity {
         
         Log.v(TAG, "ID " + regid);        
         
-        currentTopics();
+        LoadList();
     
  		Button regbtn = (Button) findViewById(R.id.Add);
 
@@ -110,6 +116,7 @@ public class DemoActivity extends Activity {
  			@Override
  			public void onClick(View v) {
  				searchRequest();
+ 				LoadList();
  			}
  		});
         
@@ -120,17 +127,33 @@ public class DemoActivity extends Activity {
         gcm = GoogleCloudMessaging.getInstance(this);
     }
     
-    private void currentTopics() {
+    private void LoadList() {
 		// TODO Auto-generated method stub
-    	final ListView listview = (ListView) findViewById(R.id.listView1);
-    	
-    	//get TOPICS!
-        String[] values = new String[] { "Orange", "Banana", "Bananas sdfsdf" };
-        ////
+    	final ListView listview = (ListView) findViewById(R.id.listView1);    	
+    	        
+        final SharedPreferences prefs = getGCMPreferences(context);
+        String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
+        
+        GetSubscribedTopicsResult topiclist = new GetSubscribedTopicsResult();
+        
+        HashMap<String, String> param = new HashMap<String, String>();        
+        param.put("regId", registrationId);
+        POSTRequest asyncHttpPost = new POSTRequest(param);
+        try {
+	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetSubscribedTopics").get();
+			Gson gson = new Gson(); 
+			topiclist = gson.fromJson(str_result, GetSubscribedTopicsResult.class);        
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
         
         final ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; ++i) {
-          list.add(values[i]);
+        for (String topic : topiclist.GetSubscribedTopicsResult){
+          list.add(topic);
         }
         
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,

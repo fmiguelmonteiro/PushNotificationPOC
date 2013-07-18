@@ -147,10 +147,6 @@ public class TopicFeedActivity extends Activity {
 
 	private void currentTopics(String topic) {
 		final ListView listview = (ListView) findViewById(R.id.TopicFeedlistView1);
-    	
-    	//get TOPICS!
-        String[] values = new String[] { "Test1", "Test2", "test3", "Test1", "Test2", "test3", "Test1", "Test2", "test3", "Test1", "Test2", "test3" };
-        ////
         
         GetMessagesResult messagelist = new GetMessagesResult();
                 
