@@ -12,13 +12,59 @@ using PushSharp.Core;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
+using System.Threading;
 
 
 namespace PushNotificationService
 {
     public class PushNotificationService : IPushNotificationService
     {
-        
+        private static MongoClient client = new MongoClient("mongodb://10.4.0.133");
+        private static PushBroker push = new PushSharp.PushBroker();
+
+        static PushNotificationService()
+          {
+            var thread = new Thread (() => {
+                while (true)
+                {
+                    var server = client.GetServer();
+
+                    var database = server.GetDatabase("pushNotification");
+                    var searchTermCollection = database.GetCollection("SearchTerm");
+
+                    var messagesCollection = database.GetCollection("Messages");
+
+
+                    var searchTerms = searchTermCollection.FindAll();
+                    foreach (var doc in searchTerms)
+                    {
+                        var searchTerm = doc["searchTerm"].ToString();
+                        var messages = messagesCollection.Find(Query.And(Query.Matches("text", searchTerm), Query.EQ("notified", false)));
+
+                        if (messages.Count() > 0)
+                        {
+
+                            var regIds = doc["regIds"];
+                            foreach (var regId in regIds.AsBsonArray)
+                            {
+                                push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
+                                push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId.ToString())
+                                                     .WithJson("{\"message\":\" " + messages.Count() + " new messages for topic " + searchTerm + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
+
+                            }
+                        }
+
+                    }
+
+                    messagesCollection.Update(Query.EQ("notified", false), Update.Set("notified", true));
+
+                    Thread.Sleep(30000);
+                }
+            });
+
+            thread.IsBackground = true;
+            thread.Start();
+          }
 
         public int Register(string regId, string searchTerm)
         {
@@ -27,6 +73,8 @@ namespace PushNotificationService
 
             var database = server.GetDatabase("pushNotification");
             var searchTermCollection = database.GetCollection("SearchTerm");
+
+            var searchTerms = searchTermCollection.FindAll();
 
             try
             {
@@ -52,11 +100,6 @@ namespace PushNotificationService
 
             try
             {
-                //var push = new PushSharp.PushBroker();
-                //push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
-                //push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId)
-                //                     .WithJson("{\"message\":\"" + message + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
-
                 var modules = messagesCollection.Find(Query.Matches("text", searchTerm));
                 foreach (var doc in modules)
                 {
@@ -64,7 +107,8 @@ namespace PushNotificationService
                     {
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
-                        Title = doc["title"].ToString()
+                        Title = doc["title"].ToString(),
+                        Url = doc["url"].ToString()
                     });
                 }
 
@@ -76,43 +120,13 @@ namespace PushNotificationService
             }
         }
 
-        public int AddMessage(string title, string text)
+        public int AddMessage(string title, string text, string url)
         {
-            var push = new PushSharp.PushBroker();
-
             var client = new MongoClient("mongodb://10.4.0.133");
             var server = client.GetServer();
             var database = server.GetDatabase("pushNotification");
 
             var searchTermCollection = database.GetCollection("SearchTerm");
-
-            try
-            {
-                //var array = new List<string>() { text };
-                var searchTerms = searchTermCollection.FindAll();
-                foreach (var doc in searchTerms)
-                {
-                    var searchTerm = doc["searchTerm"].ToString();
-                    if (text.Contains(searchTerm))
-                    {
-                        
-                        var regIds = doc["regIds"];
-                        foreach (var regId in regIds.AsBsonArray)
-                        {
-                            push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
-                            push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId.ToString())
-                                                 .WithJson("{\"message\":\"New message for " + searchTerm + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
-                            
-                        }
-                    }
-
-                }
-
-            }
-            catch (Exception e)
-            {
-                return -1;
-            }
 
             var messagesCollection = database.GetCollection("Messages");
             try
@@ -121,7 +135,10 @@ namespace PushNotificationService
                     new
                     {
                         title = title,
-                        text = text
+                        text = text,
+                        notified = false,
+                        url = url,
+                        date = DateTime.UtcNow
                     }, WriteConcern.Acknowledged);
 
                 return 0;
@@ -129,6 +146,63 @@ namespace PushNotificationService
             catch (Exception e)
             {
                 return -1;
+            }
+        }
+
+
+        public List<string> GetSubscribedTopics(string regId)
+        {
+            List<string> topics = new List<string>();
+
+            var client = new MongoClient("mongodb://10.4.0.133");
+            var server = client.GetServer();
+
+            var database = server.GetDatabase("pushNotification");
+            var searchTermCollection = database.GetCollection("SearchTerm");
+
+
+            try
+            {
+                var array = new List<string>() {regId};
+                var result = searchTermCollection.Find(Query.In("regIds", BsonArray.Create(array)));
+                foreach (var doc in result)
+                {
+                    topics.Add(doc["searchTerm"].ToString());
+                }
+
+                return topics;
+            }
+            catch (Exception e)
+            {
+                return topics;
+            }
+        }
+
+
+        public List<string> GetAllTopics()
+        {
+            List<string> topics = new List<string>();
+
+            var client = new MongoClient("mongodb://10.4.0.133");
+            var server = client.GetServer();
+
+            var database = server.GetDatabase("pushNotification");
+            var searchTermCollection = database.GetCollection("SearchTerm");
+
+
+            try
+            {
+                var result = searchTermCollection.FindAll();
+                foreach (var doc in result)
+                {
+                    topics.Add(doc["searchTerm"].ToString());
+                }
+
+                return topics;
+            }
+            catch (Exception e)
+            {
+                return topics;
             }
         }
     }

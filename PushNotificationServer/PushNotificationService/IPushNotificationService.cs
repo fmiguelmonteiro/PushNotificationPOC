@@ -20,13 +20,21 @@ namespace PushNotificationService
             UriTemplate = "Register")]
         int Register(string regId, string searchTerm);
 
-        //[OperationContract]
-        //[WebInvoke(Method = "POST",
-        //    ResponseFormat = WebMessageFormat.Json,
-        //    RequestFormat = WebMessageFormat.Json,
-        //    BodyStyle = WebMessageBodyStyle.Wrapped,
-        //    UriTemplate = "PushNotification")]
-        //int PushNotification(string apiKey, string regId, string message);
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "GetSubscribedTopics")]
+        List<string> GetSubscribedTopics(string regId);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "GetAllTopics")]
+        List<string> GetAllTopics();
 
         [OperationContract]
         [WebInvoke(Method = "POST",
@@ -42,7 +50,7 @@ namespace PushNotificationService
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "AddMessage")]
-        int AddMessage(string title, string text);
+        int AddMessage(string title, string text, string url);
 
     }
 
@@ -66,6 +74,13 @@ namespace PushNotificationService
 
         [DataMember]
         public string Text
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public string Url
         {
             get;
             set;
