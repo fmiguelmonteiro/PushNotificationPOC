@@ -49,7 +49,7 @@ namespace PushNotificationService
                             {
                                 push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
                                 push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId.ToString())
-                                                     .WithJson("{\"message\":\" " + messages.Count() + " new messages for topic " + searchTerm + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
+                                                     .WithJson("{\"topic\":\"" + searchTerm + "\", \"newMessages\":\"" + messages.Count() + "\",\"badge\":7,\"sound\":\"sound.caf\"}"));
 
                             }
                         }
