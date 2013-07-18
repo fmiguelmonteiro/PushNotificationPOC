@@ -78,7 +78,7 @@ namespace PushNotificationService
 
             try
             {
-                searchTermCollection.Update(Query.EQ("searchTerm", searchTerm ), Update.AddToSet("regIds", regId), UpdateFlags.Upsert);
+                searchTermCollection.Update(Query.EQ("searchTerm", searchTerm ), Update.AddToSet("regIds", regId).Inc("nOfSubscribers", 1), UpdateFlags.Upsert);
                 return 0;
             }
             catch (Exception e)
@@ -108,6 +108,7 @@ namespace PushNotificationService
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
                         Title = doc["title"].ToString()
+                        Url = doc["url"] != null ? doc["url"].ToString() : ""
                     });
                 }
 
@@ -187,7 +188,6 @@ namespace PushNotificationService
 
             var database = server.GetDatabase("pushNotification");
             var searchTermCollection = database.GetCollection("SearchTerm");
-
 
             try
             {
