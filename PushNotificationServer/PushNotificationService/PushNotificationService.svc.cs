@@ -206,7 +206,7 @@ namespace PushNotificationService
         }
 
 
-        public List<Topic> GetPopularTopics(int top)
+        public List<Topic> GetPopularTopics(int top, bool ascending)
         {
             List<Topic> topics = new List<Topic>();
 
@@ -216,9 +216,15 @@ namespace PushNotificationService
             var database = server.GetDatabase("pushNotification");
             var searchTermCollection = database.GetCollection("SearchTerm");
 
+            var sort = SortBy.Ascending("nOfSubscribers");
+            if (!ascending)
+	        {
+                sort = SortBy.Descending("nOfSubscribers");
+	        }
+
             try
             {
-                var result = searchTermCollection.FindAll().SetSortOrder(SortBy.Descending("nOfSubscribers")).SetLimit(top);
+                var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(top);
                 foreach (var doc in result)
                 {
                     topics.Add(new Topic()
