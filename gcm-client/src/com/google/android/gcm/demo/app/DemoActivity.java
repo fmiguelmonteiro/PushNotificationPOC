@@ -18,6 +18,7 @@ package com.google.android.gcm.demo.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.FeatureInfo;
@@ -36,12 +37,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.*;
@@ -82,6 +85,10 @@ public class DemoActivity extends Activity {
     Context context;
 
     String regid;
+    
+    class result {    	
+    	int RegisterResult;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,8 +125,7 @@ public class DemoActivity extends Activity {
     	final ListView listview = (ListView) findViewById(R.id.listView1);
     	
     	//get TOPICS!
-        String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-            "Blackberry", "WebOS" };
+        String[] values = new String[] { "Orange", "Banana", "Bananas sdfsdf" };
         ////
         
         final ArrayList<String> list = new ArrayList<String>();
@@ -143,8 +149,8 @@ public class DemoActivity extends Activity {
 		        	startActivity(mIntent);
                 }
          });
-	}
-
+	}   
+    
 	private void searchRequest(){
     	EditText editText = (EditText)findViewById(R.id.editText1);
 
@@ -157,7 +163,42 @@ public class DemoActivity extends Activity {
         data.put("regId", registrationId);
         data.put("searchTerm", editTextStr);
         POSTRequest asyncHttpPost = new POSTRequest(data);
-        asyncHttpPost.execute("http://10.0.2.2:54010/PushNotificationService.svc/Register");
+        try {
+			String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/Register").get();
+			Gson gson = new Gson(); 
+			result i = gson.fromJson(str_result, result.class);
+			
+			AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
+					DemoActivity.this);
+			if(i.RegisterResult == 0){
+				alertDialogBuilderConfirm.setMessage("Topic successfully added!");
+			}else{				
+				alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
+			}
+			
+			alertDialogBuilderConfirm.setCancelable(true);
+			alertDialogBuilderConfirm.setNeutralButton(android.R.string.ok,
+		            new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int id) {
+		            dialog.cancel();
+		        }
+		    });
+			
+			// create alert dialog
+			AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
+
+			// show it
+			alertDialogConfirm.show();
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}    
+        
+        
     }
 
     /**

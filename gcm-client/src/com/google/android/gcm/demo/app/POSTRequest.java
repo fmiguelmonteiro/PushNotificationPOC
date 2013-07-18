@@ -1,10 +1,13 @@
 package com.google.android.gcm.demo.app;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
@@ -28,7 +31,7 @@ import android.os.AsyncTask;
 public class POSTRequest extends AsyncTask<String, String, String>{
 	private Exception exception;
 	private HashMap<String, String> mData = null;// post data
-
+	
     /**
      * constructor
      */
@@ -51,8 +54,10 @@ public class POSTRequest extends AsyncTask<String, String, String>{
             httppost.setHeader("Accept", "application/json");
             
             httppost.setEntity(new StringEntity(json, "UTF-8"));
-             
-            HttpResponse response = httpclient.execute(httppost);
+                         HttpResponse  response = httpclient.execute(httppost);  
+            
+    		str = EntityUtils.toString(response.getEntity());
+            		
             
         } catch (ClientProtocolException e) {
         	e.printStackTrace();
@@ -63,8 +68,7 @@ public class POSTRequest extends AsyncTask<String, String, String>{
 		return str;
     }	
 
-	@Override
-    protected void onPostExecute(String result) {
+	protected void onPostExecute(String result) {
         // something...
     }
 }
