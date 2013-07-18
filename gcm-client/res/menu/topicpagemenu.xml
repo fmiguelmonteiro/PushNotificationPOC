@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/addTopic"
+		android:title="Add Topic" />
+    <item android:id="@+id/aboutTopicPage"
+		android:title="About" />
+	<item android:id="@+id/helpTopicPage"
+		android:title="Help" />
+</menu>

@@ -1,0 +1,77 @@
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/LinearLayoutAddTopic"
+        android:layout_width="match_parent"
+        android:layout_height="518dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textViewAddTopic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:paddingTop="8dip"
+            android:text="Add a new topic"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <EditText
+            android:id="@+id/editTextAddTopic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10" />
+
+	
+
+        <LinearLayout
+            android:id="@+id/LinearLayoutAddTopicInner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/Add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:text="Add" >
+            </Button>
+
+        </LinearLayout>
+        <LinearLayout
+        android:id="@+id/LinearLayoutAddTopic2"
+        android:layout_width="match_parent"
+        android:layout_height="518dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textViewAddTopic2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:paddingTop="8dip"
+            android:text="Most popular topics:"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <ListView
+            android:id="@+id/listViewAddTopic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+
+    </LinearLayout>
+        
+        
+    </LinearLayout>
+    
+    
+
+</ScrollView> 

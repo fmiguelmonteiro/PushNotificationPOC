@@ -14,10 +14,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class TopicFeedActivity extends Activity {
 	class Result {
@@ -40,13 +44,11 @@ public class TopicFeedActivity extends Activity {
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		    case R.id.about:
-		    //startActivity(new Intent(this, About.class));
+		    case R.id.helpTopicFeed:
+		    	Intent helpIntent = new Intent(TopicFeedActivity.this, TopicFeedHelpActivity.class);
+	        	startActivity(helpIntent);
 		    return true;
-		    case R.id.help:
-		    //startActivity(new Intent(this, Help.class));
-		    return true;
-		    case R.id.remove:
+		    case R.id.removeTopicFeed:
 			    removeTopic();
 			return true;
 		    default:
@@ -125,10 +127,10 @@ public class TopicFeedActivity extends Activity {
         
         cenas.setText(value);        
 
-        currentTopics();
+        currentTopicFeed();
     }
 
-	private void currentTopics() {
+	private void currentTopicFeed() {
 		final ListView listview = (ListView) findViewById(R.id.TopicFeedlistView1);
     	
     	//get TOPICS!
@@ -141,6 +143,7 @@ public class TopicFeedActivity extends Activity {
         	Map<String, String> list = new HashMap<String, String>(2);
         	list.put("title", values[i]);
         	list.put("description", "description test");
+        	list.put("url", "http://www.sapo.pt");
         	data.add(list);
         }
         
@@ -150,7 +153,19 @@ public class TopicFeedActivity extends Activity {
                 new int[] {android.R.id.text1,
                            android.R.id.text2});
         
-        
+        listview.setOnItemClickListener(new OnItemClickListener()
+        {
+		        public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
+		        {      
+		        	WebView wView = new WebView(TopicFeedActivity.this);
+		        	wView.getSettings().setJavaScriptEnabled(true);
+		        	Map<String, String> item = (Map<String, String>)arg0.getItemAtPosition(position);
+		        	if(item.get("url") != null && item.get("url") != ""){
+		        		wView.loadUrl(item.get("url"));
+		        	}
+		      
+                }
+         });
         listview.setAdapter(adapter);        
 	}
 }

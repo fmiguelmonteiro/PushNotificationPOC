@@ -65,6 +65,16 @@
 
         <activity
             android:name=".TopicFeedActivity"></activity>
+        <activity
+            android:name=".AddTopicActivity"></activity>
+        <activity
+            android:name=".AboutActivity"></activity>
+        <activity
+            android:name=".TopicPageHelpActivity"></activity>
+        <activity
+            android:name=".TopicFeedHelpActivity"></activity>
+        <activity
+            android:name=".AddTopicHelpActivity"></activity>
         <!--
           BroadcastReceiver that will receive intents from GCM
           services and handle them to the custom IntentService.

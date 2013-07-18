@@ -26,6 +26,9 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -81,6 +84,34 @@ public class DemoActivity extends Activity {
     Context context;
 
     String regid;
+    
+    /* Menu Code */
+	
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.topicpagemenu, menu);
+	    return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		    case R.id.aboutTopicPage:
+		    	Intent aboutIntent = new Intent(DemoActivity.this, AboutActivity.class);
+	        	startActivity(aboutIntent);
+		    return true;
+		    case R.id.helpTopicPage:
+		    	Intent helpIntent = new Intent(DemoActivity.this, TopicPageHelpActivity.class);
+	        	startActivity(helpIntent);
+		    return true;
+		    case R.id.addTopic:
+		    	Intent addIntent = new Intent(DemoActivity.this, AddTopicActivity.class);
+	        	startActivity(addIntent);
+			return true;
+		    default:
+		    return super.onOptionsItemSelected(item);
+		}
+		
+	}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
