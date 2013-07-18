@@ -107,7 +107,7 @@ namespace PushNotificationService
                     {
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
-                        Title = doc["title"].ToString()
+                        Title = doc["title"].ToString(),
                         Url = doc["url"] != null ? doc["url"].ToString() : ""
                     });
                 }
@@ -195,6 +195,38 @@ namespace PushNotificationService
                 foreach (var doc in result)
                 {
                     topics.Add(doc["searchTerm"].ToString());
+                }
+
+                return topics;
+            }
+            catch (Exception e)
+            {
+                return topics;
+            }
+        }
+
+
+        public List<Topic> GetPopularTopics(int top)
+        {
+            List<Topic> topics = new List<Topic>();
+
+            var client = new MongoClient("mongodb://10.4.0.133");
+            var server = client.GetServer();
+
+            var database = server.GetDatabase("pushNotification");
+            var searchTermCollection = database.GetCollection("SearchTerm");
+
+            try
+            {
+                var result = searchTermCollection.FindAll().SetSortOrder(SortBy.Descending("nOfSubscribers")).SetLimit(top);
+                foreach (var doc in result)
+                {
+                    topics.Add(new Topic()
+                    {
+                        Name = doc["searchTerm"].ToString(),
+                        NumberOfSubscribers = doc["nOfSubscribers"].ToString(),
+                        Id = doc["_id"].ToString(),
+                    });
                 }
 
                 return topics;
