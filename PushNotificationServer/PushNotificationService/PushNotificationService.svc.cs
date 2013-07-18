@@ -107,7 +107,8 @@ namespace PushNotificationService
                     {
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
-                        Title = doc["title"].ToString()
+                        Title = doc["title"].ToString(),
+                        Url = doc["url"].ToString()
                     });
                 }
 
@@ -119,7 +120,7 @@ namespace PushNotificationService
             }
         }
 
-        public int AddMessage(string title, string text)
+        public int AddMessage(string title, string text, string url)
         {
             var client = new MongoClient("mongodb://10.4.0.133");
             var server = client.GetServer();
@@ -136,6 +137,7 @@ namespace PushNotificationService
                         title = title,
                         text = text,
                         notified = false,
+                        url = url,
                         date = DateTime.UtcNow
                     }, WriteConcern.Acknowledged);
 
