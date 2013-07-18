@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.http.HttpResponse;
+
+import com.google.android.gcm.demo.app.DemoActivity.result;
+import com.google.gson.Gson;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,6 +35,17 @@ public class TopicFeedActivity extends Activity {
         	description = address;
         }
 	}
+	
+	class GetMessagesResult{		
+		List<Message> GetMessagesResult;
+	}
+	
+	class Message
+    {
+        public String Id;           
+        public String Title;                
+        public String Text;
+    }
 	
 	/* Menu Code */
 	
@@ -119,30 +136,43 @@ public class TopicFeedActivity extends Activity {
 
         setContentView(R.layout.topicfeed);
         
-        String value = getIntent().getExtras().getString("FeedName");
+        String topic = getIntent().getExtras().getString("FeedName");
         
         TextView cenas = (TextView)findViewById(R.id.TopicfeedText1);
         
-        cenas.setText(value);        
+        cenas.setText(topic);            
+       
+        currentTopics(topic);
+    }      
 
-        currentTopics();
-    }
-
-	private void currentTopics() {
+	private void currentTopics(String topic) {
 		final ListView listview = (ListView) findViewById(R.id.TopicFeedlistView1);
-    	
-    	//get TOPICS!
-        String[] values = new String[] { "Test1", "Test2", "test3", "Test1", "Test2", "test3", "Test1", "Test2", "test3", "Test1", "Test2", "test3" };
-        ////
-                
         
-        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
-        for (int i = 0; i < values.length; ++i) {
+        GetMessagesResult messagelist = new GetMessagesResult();
+                
+        HashMap<String, String> param = new HashMap<String, String>();        
+        param.put("searchTerm", topic);
+        POSTRequest asyncHttpPost = new POSTRequest(param);
+        try {
+	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetMessages").get();
+			Gson gson = new Gson(); 
+			messagelist = gson.fromJson(str_result, GetMessagesResult.class);        
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+        
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();        	
+        for (Message mess : messagelist.GetMessagesResult){
         	Map<String, String> list = new HashMap<String, String>(2);
-        	list.put("title", values[i]);
-        	list.put("description", "description test");
+        	list.put("title", mess.Title);
+        	list.put("description", mess.Text);
         	data.add(list);
         }
+       
         
         SimpleAdapter adapter = new SimpleAdapter(this, data,
                 android.R.layout.simple_list_item_2,
