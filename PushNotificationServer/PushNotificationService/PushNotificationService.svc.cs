@@ -13,6 +13,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 
 namespace PushNotificationService
@@ -39,7 +40,13 @@ namespace PushNotificationService
                     foreach (var doc in searchTerms)
                     {
                         var searchTerm = doc["searchTerm"].ToString();
-                        var messages = messagesCollection.Find(Query.And(Query.Matches("text", searchTerm), Query.EQ("notified", false)));
+
+                        var messages = messagesCollection.Find(
+                            Query.And(
+                                Query.Matches("text", BsonRegularExpression.Create(new Regex(searchTerm, RegexOptions.IgnoreCase))), 
+                                Query.EQ("notified", false)
+                            )
+                        );
 
                         if (messages.Count() > 0)
                         {
