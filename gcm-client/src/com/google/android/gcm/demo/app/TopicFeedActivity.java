@@ -230,7 +230,7 @@ public class TopicFeedActivity extends Activity {
         data.put("topic", topic);
         POSTRequest asyncHttpPost = new POSTRequest(data);
         try {
-			String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/UnsubscribeTopic").get();
+			String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/UnsubscribeTopic").get();
 			Gson gson = new Gson(); 
 			UnsubscribeTopicResult i = gson.fromJson(str_result, UnsubscribeTopicResult.class);
 			
