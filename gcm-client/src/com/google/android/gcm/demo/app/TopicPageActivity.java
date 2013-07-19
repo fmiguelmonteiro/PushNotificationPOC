@@ -26,15 +26,13 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -183,7 +181,7 @@ public class TopicPageActivity extends Activity {
 	public void LoadList() {
 		// TODO Auto-generated method stub
     	final ListView listview = (ListView) findViewById(R.id.listViewTopicPage);    	
-    	        
+        LinearLayout layout = (LinearLayout) findViewById(R.id.LinearLayoutTopicPage);
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
         
@@ -208,23 +206,32 @@ public class TopicPageActivity extends Activity {
         for (String topic : topiclist.GetSubscribedTopicsResult){
           list.add(topic);
         }
-        
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, list);
-        
-        listview.setAdapter(adapter);        
-        
-        listview.setOnItemClickListener(new OnItemClickListener()
-        {
-		        public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
-		        {      
-		        	Intent mIntent = new Intent(TopicPageActivity.this, TopicFeedActivity.class);
-		        	
-		        	mIntent.putExtra("FeedName", listview.getItemAtPosition(position).toString()); 
-		        	
-		        	startActivity(mIntent);
-                }
-         });
+        if(list.size() > 0){
+            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, list);
+
+            listview.setAdapter(adapter);
+
+            listview.setOnItemClickListener(new OnItemClickListener()
+            {
+                    public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
+                    {
+                        Intent mIntent = new Intent(TopicPageActivity.this, TopicFeedActivity.class);
+
+                        mIntent.putExtra("FeedName", listview.getItemAtPosition(position).toString());
+
+                        startActivity(mIntent);
+                    }
+             });
+        }else{
+            LinearLayout.LayoutParams lparams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            TextView tv=new TextView(this);
+            tv.setLayoutParams(lparams);
+            tv.setText("You have no topics yet.");
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            layout.addView(tv);
+        }
 	}   
     
 	

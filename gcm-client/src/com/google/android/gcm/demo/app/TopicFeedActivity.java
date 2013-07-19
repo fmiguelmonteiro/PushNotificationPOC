@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.Date;
 
+import android.util.TypedValue;
+import android.widget.*;
 import org.apache.http.HttpResponse;
 
 import com.google.android.gms.internal.bs;
@@ -25,13 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Toast;
 
 public class TopicFeedActivity extends Activity {
 	class Result {
@@ -191,31 +187,42 @@ public class TopicFeedActivity extends Activity {
         	
         	data.add(list);
         }
-        
-        SimpleAdapter adapter = new SimpleAdapter(this, data,
-        	    R.layout.multi_lines,
-        	    new String[] { "line1","line2", "line3" },
-        	    new int[] {R.id.line_a, R.id.line_b, R.id.line_c});
-        
-        listview.setOnItemClickListener(new OnItemClickListener()
-        {
-		        public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
-		        {      
-		        	WebView wView = new WebView(TopicFeedActivity.this);
-		        	wView.getSettings().setJavaScriptEnabled(true);
-		        	Map<String, String> item = (Map<String, String>)arg0.getItemAtPosition(position);
-		              	
-		        	if(item.get("url") !=  null && item.get("url") != ""){
-		        		wView.loadUrl(item.get("url"));
-		        	}
-		        	else{
-		        		//display in short period of time
-		        		Toast.makeText(getApplicationContext(), "This feed has no URL!", Toast.LENGTH_SHORT).show();
-		        	}
-		      
-                }
-         });
-        listview.setAdapter(adapter);        
+
+        if(data.size() > 0){
+            SimpleAdapter adapter = new SimpleAdapter(this, data,
+                    R.layout.multi_lines,
+                    new String[] { "line1","line2", "line3" },
+                    new int[] {R.id.line_a, R.id.line_b, R.id.line_c});
+
+            listview.setOnItemClickListener(new OnItemClickListener()
+            {
+                    public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
+                    {
+                        WebView wView = new WebView(TopicFeedActivity.this);
+                        wView.getSettings().setJavaScriptEnabled(true);
+                        Map<String, String> item = (Map<String, String>)arg0.getItemAtPosition(position);
+
+                        if(item.get("url") !=  null && item.get("url") != ""){
+                            wView.loadUrl(item.get("url"));
+                        }
+                        else{
+                            //display in short period of time
+                            Toast.makeText(getApplicationContext(), "This feed has no URL!", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+             });
+            listview.setAdapter(adapter);
+        }else{
+            LinearLayout layout = (LinearLayout) findViewById(R.id.TopicFeedLinearLayout01);
+            LinearLayout.LayoutParams lparams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            TextView tv=new TextView(this);
+            tv.setLayoutParams(lparams);
+            tv.setText("There are no feeds for this topic yet.");
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            layout.addView(tv);
+        }
 	}
 
 }
