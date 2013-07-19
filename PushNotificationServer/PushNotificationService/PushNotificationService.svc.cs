@@ -212,20 +212,15 @@ namespace PushNotificationService
         {
             List<string> topics = new List<string>();
 
-            var client = new MongoClient("mongodb://10.4.0.133");
-            var server = client.GetServer();
-
-            var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("Topics");
-
-
             try
             {
-                var array = new List<string>() { regId };
-                var result = searchTermCollection.Find(Query.In("RegIds", BsonArray.Create(array)));
+                var result = CollectionTopics.AsQueryable<Topic>()
+                .Where(t => t.RegIds.Contains(regId))
+                .OrderBy(t => t.Name);
+
                 foreach (var doc in result)
                 {
-                    topics.Add(doc["Name"].ToString());
+                    topics.Add(doc.Name);
                 }
 
                 return topics;
