@@ -41,6 +41,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gcm.demo.app.TopicFeedActivity.GetMessagesResult;
 import com.google.android.gcm.demo.app.TopicFeedActivity.Message;
@@ -66,7 +67,7 @@ import org.apache.http.message.BasicNameValuePair;
 /**
  * Main UI for the demo app.
  */
-public class DemoActivity extends Activity {
+public class TopicPageActivity extends Activity {
 
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
@@ -93,7 +94,7 @@ public class DemoActivity extends Activity {
     Context context;
 
     String regid;
-    
+    private boolean resumeHasRun = false;
 
     /* Menu Code */
 	
@@ -106,15 +107,15 @@ public class DemoActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		    case R.id.aboutTopicPage:
-		    	Intent aboutIntent = new Intent(DemoActivity.this, AboutActivity.class);
+		    	Intent aboutIntent = new Intent(TopicPageActivity.this, AboutActivity.class);
 	        	startActivity(aboutIntent);
 		    return true;
 		    case R.id.helpTopicPage:
-		    	Intent helpIntent = new Intent(DemoActivity.this, TopicPageHelpActivity.class);
+		    	Intent helpIntent = new Intent(TopicPageActivity.this, TopicPageHelpActivity.class);
 	        	startActivity(helpIntent);
 		    return true;
 		    case R.id.addTopic:
-		    	Intent addIntent = new Intent(DemoActivity.this, AddTopicActivity.class);
+		    	Intent addIntent = new Intent(TopicPageActivity.this, AddTopicActivity.class);
 	        	startActivity(addIntent);
 			return true;
 		    default:
@@ -130,59 +131,77 @@ public class DemoActivity extends Activity {
 		List<String> GetSubscribedTopicsResult;
 
 	}
+    
+    @Override
+    protected void onRestart() {
+    	super.onRestart();
+    	InternetConnection iConn = new InternetConnection();
+        if(!iConn.checkInternetConnection(this)){
+       	 AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
+					TopicPageActivity.this);
+			alertDialogBuilderConfirm.setMessage("No internet connection!");
+			alertDialogBuilderConfirm.setCancelable(true);
+			alertDialogBuilderConfirm.setNeutralButton(android.R.string.ok,
+		            new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int id) {
+		        	startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+		        }
+		    });
+			
+			// create alert dialog
+			AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
 
+			// show it
+			alertDialogConfirm.show();
+        }
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       InternetConnection iConn = new InternetConnection();
+        if(iConn.checkInternetConnection(this)){
+        	setContentView(R.layout.topicpage);
 
-        setContentView(R.layout.main);
- //       mDisplay = (TextView) findViewById(R.id.display);
+        	context = getApplicationContext();
+            regid = getRegistrationId(context);
+            
+            Log.v(TAG, "ID " + regid);
+            
+            LoadList();
+            
+            if (regid.length() == 0) {
+                registerBackground();
+            }
+            gcm = GoogleCloudMessaging.getInstance(this);
+        	
+        }else{
+        	AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
+					TopicPageActivity.this);
+			alertDialogBuilderConfirm.setMessage("No internet connection!");
+			alertDialogBuilderConfirm.setCancelable(true);
+			alertDialogBuilderConfirm.setNeutralButton(android.R.string.ok,
+		            new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int id) {
+		        	dialog.cancel();
+		        	startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+		        }
+		    });
+			
+			// create alert dialog
+			AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
 
-        context = getApplicationContext();
-        regid = getRegistrationId(context);
+			// show it
+			alertDialogConfirm.show();
+        	
+        }   
         
-        Log.v(TAG, "ID " + regid);        
-        
-        LoadList();
-    
- 		final Button regbtn = (Button) findViewById(R.id.Add);
- 		final EditText editText = (EditText)findViewById(R.id.editText1);		
-
- 		regbtn.setOnClickListener(new View.OnClickListener() {
- 			@Override
- 			public void onClick(View v) {
- 				searchRequest();
- 				LoadList();
- 				editText.setText("");
- 			}
- 		});		 		
- 		
- 		regbtn.setEnabled(false);
-    	 		
- 		editText.addTextChangedListener(new TextWatcher() {
-
- 		    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
- 		    public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
- 		    public void afterTextChanged(Editable s) {
- 		        if (s == null || s.length() == 0) {
- 		        	regbtn.setEnabled(false);
- 		        }
- 		        else {
- 		        	regbtn.setEnabled(true);
- 		        }
- 		    }
- 		});        
-        
-        if (regid.length() == 0) {
-            registerBackground();
-        }
-        gcm = GoogleCloudMessaging.getInstance(this);
     }
     
-    private void LoadList() {
+
+	public void LoadList() {
 		// TODO Auto-generated method stub
-    	final ListView listview = (ListView) findViewById(R.id.listView1);    	
+    	final ListView listview = (ListView) findViewById(R.id.listViewTopicPage);    	
     	        
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
@@ -218,7 +237,7 @@ public class DemoActivity extends Activity {
         {
 		        public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
 		        {      
-		        	Intent mIntent = new Intent(DemoActivity.this, TopicFeedActivity.class);
+		        	Intent mIntent = new Intent(TopicPageActivity.this, TopicFeedActivity.class);
 		        	
 		        	mIntent.putExtra("FeedName", listview.getItemAtPosition(position).toString()); 
 		        	
@@ -227,55 +246,7 @@ public class DemoActivity extends Activity {
          });
 	}   
     
-	private void searchRequest(){
-    	EditText editText = (EditText)findViewById(R.id.editText1);
-
-    	String editTextStr = editText.getText().toString();
-    	
-        final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");       
-        
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put("regId", registrationId);
-        data.put("searchTerm", editTextStr);
-        POSTRequest asyncHttpPost = new POSTRequest(data);
-        try {
-			String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/Register").get();
-			Gson gson = new Gson(); 
-			result i = gson.fromJson(str_result, result.class);
-			
-			AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
-					DemoActivity.this);
-			if(i.RegisterResult == 0){
-				alertDialogBuilderConfirm.setMessage("Topic successfully added!");
-			}else{				
-				alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
-			}
-			
-			alertDialogBuilderConfirm.setCancelable(true);
-			alertDialogBuilderConfirm.setNeutralButton(android.R.string.ok,
-		            new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int id) {
-		            dialog.cancel();
-		        }
-		    });
-			
-			// create alert dialog
-			AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
-
-			// show it
-			alertDialogConfirm.show();
-		
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}    
-        
-        
-    }
+	
 
     /**
      * Stores the registration id, app versionCode, and expiration time in the application's
@@ -365,34 +336,6 @@ public class DemoActivity extends Activity {
         }.execute(null, null, null);
     }
 
-    public void onClick(final View view) {
-       /* if (view == findViewById(R.id.send)) {
-            new AsyncTask<Void, Void, String>() {
-                @Override
-                protected String doInBackground(Void... params) {
-                    String msg = "";
-                    try {
-                        Bundle data = new Bundle();
-                        data.putString("hello", "World");
-                        String id = Integer.toString(msgId.incrementAndGet());
-                        gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
-                        msg = "Sent message";
-                    } catch (IOException ex) {
-                        msg = "Error :" + ex.getMessage();
-                    }
-                    return msg;
-                }
-
-                @Override
-                protected void onPostExecute(String msg) {
-                    mDisplay.append(msg + "\n");
-                }
-            }.execute(null, null, null);
-        } else if (view == findViewById(R.id.clear)) {
-            mDisplay.setText("");
-        } */
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -416,7 +359,7 @@ public class DemoActivity extends Activity {
      * @return Application's {@code SharedPreferences}.
      */
     private SharedPreferences getGCMPreferences(Context context) {
-        return getSharedPreferences(DemoActivity.class.getSimpleName(), Context.MODE_PRIVATE);
+        return getSharedPreferences(TopicPageActivity.class.getSimpleName(), Context.MODE_PRIVATE);
     }
 
     /**

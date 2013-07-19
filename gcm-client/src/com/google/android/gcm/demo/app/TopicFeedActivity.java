@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpResponse;
 
+import com.google.android.gms.internal.bs;
 import com.google.gson.Gson;
 
 import android.app.Activity;
@@ -16,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +29,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 public class TopicFeedActivity extends Activity {
 	class Result {
@@ -48,6 +51,7 @@ public class TopicFeedActivity extends Activity {
         public String Id;           
         public String Title;                
         public String Text;
+        public String Url;
     }
 	
 	/* Menu Code */
@@ -101,7 +105,7 @@ public class TopicFeedActivity extends Activity {
 								// if this button is clicked, just close
 								// the dialog box and do nothing
 								dialog.cancel();
-								Intent mIntent = new Intent(TopicFeedActivity.this, DemoActivity.class);
+								Intent mIntent = new Intent(TopicFeedActivity.this, TopicPageActivity.class);
 								mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					        	startActivity(mIntent);
 							}
@@ -171,6 +175,7 @@ public class TopicFeedActivity extends Activity {
         	Map<String, String> list = new HashMap<String, String>(2);
         	list.put("title", mess.Title);
         	list.put("description", mess.Text);
+        	list.put("url", mess.Url);
         	data.add(list);
         }
         
@@ -187,12 +192,18 @@ public class TopicFeedActivity extends Activity {
 		        	WebView wView = new WebView(TopicFeedActivity.this);
 		        	wView.getSettings().setJavaScriptEnabled(true);
 		        	Map<String, String> item = (Map<String, String>)arg0.getItemAtPosition(position);
-		        	if(item.get("url") != null && item.get("url") != ""){
+		              	
+		        	if(item.get("url") !=  null && item.get("url") != ""){
 		        		wView.loadUrl(item.get("url"));
+		        	}
+		        	else{
+		        		//display in short period of time
+		        		Toast.makeText(getApplicationContext(), "This feed has no URL!", Toast.LENGTH_SHORT).show();
 		        	}
 		      
                 }
          });
         listview.setAdapter(adapter);        
 	}
+
 }

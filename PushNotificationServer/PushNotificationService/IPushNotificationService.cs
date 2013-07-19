@@ -42,7 +42,7 @@ namespace PushNotificationService
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetPopularTopics")]
-        List<Topic> GetPopularTopics(int top, bool ascending);
+        List<Topic> GetPopularTopics();
 
         [OperationContract]
         [WebInvoke(Method = "POST",

@@ -57,7 +57,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
                 ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-                new Intent(ctx, DemoActivity.class), 0);
+                new Intent(ctx, TopicPageActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
