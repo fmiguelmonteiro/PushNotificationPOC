@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace PushNotificationService
 {
@@ -158,6 +159,13 @@ namespace PushNotificationService
     {
 
         [DataMember]
+        [BsonId]
+        public ObjectId ObjectId
+        {
+            get;
+            set;
+        }
+
         public string Id
         {
             get;

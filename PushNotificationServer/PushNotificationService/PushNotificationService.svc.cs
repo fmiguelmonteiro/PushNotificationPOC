@@ -281,16 +281,22 @@ namespace PushNotificationService
 
             var sort = SortBy.Descending("NumberOfSubscribers");
 
+
+
             try
             {
-                var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(topPopuparTopics);
+                //var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(topPopuparTopics);
+                var result = CollectionTopics.AsQueryable<Topic>()
+                    .Where(t => !t.RegIds.Contains(regId))
+                    .OrderByDescending(t => t.NumberOfSubscribers)
+                    .Take(topPopuparTopics);
                 foreach (var doc in result)
                 {
                     topics.Add(new Topic()
                     {
-                        Name = doc["Name"].ToString(),
-                        NumberOfSubscribers = doc["NumberOfSubscribers"].ToInt32(),
-                        Id = doc["_id"].ToString(),
+                        Name = doc.Name,
+                        NumberOfSubscribers = doc.NumberOfSubscribers,
+                        Id = doc.ObjectId.ToString()
                     });
                 }
             }
