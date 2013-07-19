@@ -154,7 +154,7 @@ public class AddTopicActivity extends Activity {
 	        data.put("topic", editTextStr);
 	        POSTRequest asyncHttpPost = new POSTRequest(data);
 	        try {
-				String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/SubscribeTopic").get();
+				String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/SubscribeTopic").get();
 				Gson gson = new Gson(); 
 				SubscribeTopicResult i = gson.fromJson(str_result, SubscribeTopicResult.class);
 				
@@ -203,7 +203,7 @@ public class AddTopicActivity extends Activity {
         param.put("regId", registrationId);
         POSTRequest asyncHttpPost = new POSTRequest(param);
         try {
-	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetPopularTopics").get();
+	        String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/GetPopularTopics").get();
 			Gson gson = new Gson(); 
 			topiclist = gson.fromJson(str_result, GetPopularTopicsResult.class);        
 		} catch (InterruptedException e) {

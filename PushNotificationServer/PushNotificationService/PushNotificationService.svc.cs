@@ -11,6 +11,7 @@ using PushSharp.Apple;
 using PushSharp.Core;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq;
 using MongoDB.Bson;
 using System.Threading;
 using System.Text.RegularExpressions;
@@ -101,11 +102,15 @@ namespace PushNotificationService
         {
             try
             {
-                IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
-                IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId)
-                    .Inc(t => t.NumberOfSubscribers, 1);
-                
-                CollectionTopics.Update(query, update, UpdateFlags.Upsert);
+
+                var result = CollectionTopics.AsQueryable<Topic>()
+                    .Where(t => t.Name == topic && t.RegIds.Contains(regId));
+                if (result.Count() == 0)
+                {
+                    IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
+                    IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId);
+                    CollectionTopics.Update(query, update, UpdateFlags.Upsert);
+                }
             }
             catch (Exception e)
             {
@@ -118,35 +123,22 @@ namespace PushNotificationService
         {
             try
             {
-                IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
-                IMongoUpdate update = Update<Topic>.Pull(t => t.RegIds, regId)
-                    .Inc(t => t.NumberOfSubscribers, -1);
+                var result = CollectionTopics.AsQueryable<Topic>()
+                    .Where(t => t.Name == topic && t.RegIds.Contains(regId));
+                if (result.Count() > 0)
+                {
+                    IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
+                    IMongoUpdate update = Update<Topic>.Pull(t => t.RegIds, regId)
+                        .Inc(t => t.NumberOfSubscribers, -1);
 
-                CollectionTopics.Update(query, update);
+                    CollectionTopics.Update(query, update);
+                }
             }
             catch (Exception e)
             {
                 return -1;
             }
             return 0;
-
-            //var client = new MongoClient("mongodb://10.4.0.133");
-            //var server = client.GetServer();
-
-            //var database = server.GetDatabase("pushNotification");
-            //var searchTermCollection = database.GetCollection("SearchTerm");
-
-            //var searchTerms = searchTermCollection.FindAll();
-
-            //try
-            //{
-            //    searchTermCollection.Update(Query.EQ("searchTerm", topic), Update.AddToSet("regIds", regId).Inc("nOfSubscribers", 1), UpdateFlags.Upsert);
-            //    return 0;
-            //}
-            //catch (Exception e)
-            //{
-            //    return -1;
-            //}
         }
 
         public List<Message> GetMessages(string searchTerm)
@@ -223,16 +215,16 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
+            var searchTermCollection = database.GetCollection("Topics");
 
 
             try
             {
                 var array = new List<string>() { regId };
-                var result = searchTermCollection.Find(Query.In("regIds", BsonArray.Create(array)));
+                var result = searchTermCollection.Find(Query.In("RegIds", BsonArray.Create(array)));
                 foreach (var doc in result)
                 {
-                    topics.Add(doc["searchTerm"].ToString());
+                    topics.Add(doc["Name"].ToString());
                 }
 
                 return topics;
@@ -252,14 +244,14 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
+            var searchTermCollection = database.GetCollection("Topics");
 
             try
             {
                 var result = searchTermCollection.FindAll();
                 foreach (var doc in result)
                 {
-                    topics.Add(doc["searchTerm"].ToString());
+                    topics.Add(doc["Name"].ToString());
                 }
 
                 return topics;
@@ -285,9 +277,9 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
+            var searchTermCollection = database.GetCollection("Topics");
 
-            var sort = SortBy.Ascending("nOfSubscribers");
+            var sort = SortBy.Ascending("NumberOfSubscribers");
 
             try
             {
@@ -296,8 +288,8 @@ namespace PushNotificationService
                 {
                     topics.Add(new Topic()
                     {
-                        Name = doc["searchTerm"].ToString(),
-                        NumberOfSubscribers = doc["nOfSubscribers"].ToInt32(),
+                        Name = doc["Name"].ToString(),
+                        NumberOfSubscribers = doc["NumberOfSubscribers"].ToInt32(),
                         Id = doc["_id"].ToString(),
                     });
                 }
