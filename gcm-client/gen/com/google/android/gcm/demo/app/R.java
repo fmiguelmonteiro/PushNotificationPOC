@@ -15,26 +15,56 @@ public final class R {
         public static final int ic_stat_gcm=0x7f020001;
     }
     public static final class id {
-        public static final int Add=0x7f060004;
-        public static final int LinearLayout01=0x7f060000;
-        public static final int LinearLayout02=0x7f060003;
-        public static final int TopicFeedLinearLayout01=0x7f060007;
-        public static final int TopicFeedlistView1=0x7f060009;
-        public static final int TopicfeedText1=0x7f060008;
-        public static final int about=0x7f06000b;
-        public static final int editText1=0x7f060002;
-        public static final int help=0x7f06000c;
-        public static final int listView1=0x7f060006;
-        public static final int remove=0x7f06000a;
-        public static final int textView1=0x7f060001;
-        public static final int textView2=0x7f060005;
+        public static final int Add=0x7f060007;
+        public static final int LinearLayoutAbout=0x7f060000;
+        public static final int LinearLayoutAddTopic=0x7f060003;
+        public static final int LinearLayoutAddTopic2=0x7f060008;
+        public static final int LinearLayoutAddTopicHelp=0x7f06000b;
+        public static final int LinearLayoutAddTopicInner=0x7f060006;
+        public static final int LinearLayoutTopicFeedHelp=0x7f060014;
+        public static final int LinearLayoutTopicPage=0x7f060017;
+        public static final int LinearLayoutTopicPageHelp=0x7f06001a;
+        public static final int TopicFeedLinearLayout01=0x7f060011;
+        public static final int TopicFeedlistView1=0x7f060013;
+        public static final int TopicfeedText1=0x7f060012;
+        public static final int aboutTopicPage=0x7f060021;
+        public static final int addTopic=0x7f060020;
+        public static final int addTopicHelp=0x7f06001d;
+        public static final int editTextAddTopic=0x7f060005;
+        public static final int helpTopicFeed=0x7f06001f;
+        public static final int helpTopicPage=0x7f060022;
+        public static final int line_a=0x7f06000e;
+        public static final int line_b=0x7f06000f;
+        public static final int line_c=0x7f060010;
+        public static final int listViewAddTopic=0x7f06000a;
+        public static final int listViewTopicPage=0x7f060019;
+        public static final int removeTopicFeed=0x7f06001e;
+        public static final int textViewAbout=0x7f060001;
+        public static final int textViewAboutInfo=0x7f060002;
+        public static final int textViewAddTopic=0x7f060004;
+        public static final int textViewAddTopic2=0x7f060009;
+        public static final int textViewAddTopicHelp=0x7f06000c;
+        public static final int textViewTopicAddTopicHelpInfo=0x7f06000d;
+        public static final int textViewTopicFeedHelp=0x7f060015;
+        public static final int textViewTopicFeedHelpInfo=0x7f060016;
+        public static final int textViewTopicPage=0x7f060018;
+        public static final int textViewTopicPageHelp=0x7f06001b;
+        public static final int textViewTopicPageHelpInfo=0x7f06001c;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
-        public static final int topicfeed=0x7f030001;
+        public static final int about=0x7f030000;
+        public static final int addtopic=0x7f030001;
+        public static final int addtopichelp=0x7f030002;
+        public static final int multi_lines=0x7f030003;
+        public static final int topicfeed=0x7f030004;
+        public static final int topicfeedhelp=0x7f030005;
+        public static final int topicpage=0x7f030006;
+        public static final int topicpagehelp=0x7f030007;
     }
     public static final class menu {
-        public static final int topicfeedmenu=0x7f050000;
+        public static final int addtopicmenu=0x7f050000;
+        public static final int topicfeedmenu=0x7f050001;
+        public static final int topicpagemenu=0x7f050002;
     }
     public static final class string {
         public static final int already_registered=0x7f040002;

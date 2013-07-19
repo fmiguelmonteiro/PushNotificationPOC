@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using MongoDB.Bson;
 
 namespace PushNotificationService
 {
@@ -17,8 +18,16 @@ namespace PushNotificationService
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
-            UriTemplate = "Register")]
-        int Register(string regId, string searchTerm);
+            UriTemplate = "SubscribeTopic")]
+        int SubscribeTopic(string regId, string topic);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "UnsubscribeTopic")]
+        int UnsubscribeTopic(string regId, string topic);
 
         [OperationContract]
         [WebInvoke(Method = "POST",
@@ -42,7 +51,7 @@ namespace PushNotificationService
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetPopularTopics")]
-        List<Topic> GetPopularTopics();
+        List<Topic> GetPopularTopics(string regId);
 
         [OperationContract]
         [WebInvoke(Method = "POST",
@@ -60,6 +69,48 @@ namespace PushNotificationService
             UriTemplate = "AddMessage")]
         int AddMessage(string title, string text, string url);
 
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "GetUserSettings")]
+        UserSettings GetUserSettings(string regId);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "SaveUserSetting")]
+        int SaveUserSetting(UserSettings settings);
+
+    }
+
+    [DataContract]
+    public class UserSettings
+    {
+
+        [DataMember]
+        public ObjectId Id
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public string RegId
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public int TopPopuparTopics
+        {
+            get;
+            set;
+        }
     }
 
     [DataContract]
@@ -121,33 +172,17 @@ namespace PushNotificationService
         }
 
         [DataMember]
-        public string NumberOfSubscribers
+        public int NumberOfSubscribers
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public List<string> RegIds
         {
             get;
             set;
         }
     }
-
-
-    // Use a data contract as illustrated in the sample below to add composite types to service operations.
-    //[DataContract]
-    //public class CompositeType
-    //{
-    //    bool boolValue = true;
-    //    string stringValue = "Hello ";
-
-    //    [DataMember]
-    //    public bool BoolValue
-    //    {
-    //        get { return boolValue; }
-    //        set { boolValue = value; }
-    //    }
-
-    //    [DataMember]
-    //    public string StringValue
-    //    {
-    //        get { return stringValue; }
-    //        set { stringValue = value; }
-    //    }
-    //}
 }
