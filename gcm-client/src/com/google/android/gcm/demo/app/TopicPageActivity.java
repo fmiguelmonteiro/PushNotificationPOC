@@ -26,6 +26,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -141,41 +142,42 @@ public class TopicPageActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        InternetConnection iConn = new InternetConnection();
-        if(iConn.checkInternetConnection(this)){
-        	setContentView(R.layout.topicpage);
+		if (iConn.checkInternetConnection(this)) {
+			setContentView(R.layout.topicpage);
 
-        	context = getApplicationContext();
-            regid = getRegistrationId(context);
-            
-            Log.v(TAG, "ID " + regid);
-            
-            LoadList();
-            
-            if (regid.length() == 0) {
-                registerBackground();
-            }
-            gcm = GoogleCloudMessaging.getInstance(this);
-        	
-        }else{
-        	AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
+			context = getApplicationContext();
+			regid = getRegistrationId(context);
+
+			Log.v(TAG, "ID " + regid);
+
+			LoadList();
+
+			if (regid.length() == 0) {
+				registerBackground();
+			}
+			gcm = GoogleCloudMessaging.getInstance(this);
+
+		} else {
+			AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
 					TopicPageActivity.this);
 			alertDialogBuilderConfirm.setMessage("No internet connection!");
 			alertDialogBuilderConfirm.setCancelable(true);
 			alertDialogBuilderConfirm.setNeutralButton(android.R.string.ok,
-		            new DialogInterface.OnClickListener() {
-		        public void onClick(DialogInterface dialog, int id) {
-		        	dialog.cancel();
-		        	startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-		        }
-		    });
-			
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+							startActivity(new Intent(
+									android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+						}
+					});
+
 			// create alert dialog
 			AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
 
 			// show it
 			alertDialogConfirm.show();
-        	
-        }   
+
+		}
         
     }
     
@@ -259,7 +261,7 @@ public class TopicPageActivity extends Activity {
      * @return registration id, or empty string if the registration is not
      *         complete.
      */
-    private String getRegistrationId(Context context) {
+    public String getRegistrationId(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.length() == 0) {
@@ -363,4 +365,14 @@ public class TopicPageActivity extends Activity {
                 prefs.getLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, -1);
         return System.currentTimeMillis() > expirationTime;
     }
+    
+    //Don't allow back to action in homepage
+    @Override  
+	   public boolean onKeyDown(int keyCode, KeyEvent event)  
+	   {  
+	       if (keyCode == KeyEvent.KEYCODE_BACK) {
+	           return true;
+	       }
+	       return super.onKeyDown(keyCode, event); 
+	}
 }

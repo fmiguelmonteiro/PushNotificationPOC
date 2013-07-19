@@ -6,27 +6,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.Date;
-
-import org.apache.http.HttpResponse;
-
-import com.google.android.gms.internal.bs;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -57,6 +51,12 @@ public class TopicFeedActivity extends Activity {
         public String Url;
     }
 	
+	class UnsubscribeTopicResult {    	
+    	int UnsubscribeTopicResult;
+    }
+	
+	public static final String PROPERTY_REG_ID = "registration_id";
+	
 	/* Menu Code */
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,7 +81,7 @@ public class TopicFeedActivity extends Activity {
 	}
 	
 	private void removeTopic() {
-		String topic = getIntent().getExtras().getString("FeedName");
+		final String topic = getIntent().getExtras().getString("FeedName");
 		
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				TopicFeedActivity.this);
@@ -95,23 +95,30 @@ public class TopicFeedActivity extends Activity {
 				.setCancelable(false)
 				.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
-						// if this button is clicked, close
-						// current activity
-						//MainActivity.this.finish();
+						
+						Context context = getApplicationContext();
+						final SharedPreferences prefs = getGCMPreferences(context);
+				        String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
+						int removeTopicResult = deleteTopicFromServer(registrationId, topic);
+						
 						AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
 								TopicFeedActivity.this);
+						
+						if(removeTopicResult == 0){
+							alertDialogBuilderConfirm.setMessage("Topic successfully removed!");
+						}else{				
+							alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
+						}
+						
 						alertDialogBuilderConfirm
 						.setMessage("Topic Removed!")
 						.setCancelable(false)
 						.setNegativeButton("OK",new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,int id) {
-								// if this button is clicked, just close
-								// the dialog box and do nothing
 								dialog.cancel();
 								Intent mIntent = new Intent(TopicFeedActivity.this, TopicPageActivity.class);
-								mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					        	startActivity(mIntent);
-							}
+							}							
 						});
 						// create alert dialog
 						AlertDialog alertDialogConfirm = alertDialogBuilderConfirm.create();
@@ -122,8 +129,6 @@ public class TopicFeedActivity extends Activity {
 				  })
 				  .setNegativeButton("No",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
-						// if this button is clicked, just close
-						// the dialog box and do nothing
 						dialog.cancel();
 					}
 				});
@@ -217,5 +222,34 @@ public class TopicFeedActivity extends Activity {
          });
         listview.setAdapter(adapter);        
 	}
+	
+	private int deleteTopicFromServer(String regid, String topic) {
+		        
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put("regId", regid);
+        data.put("topic", topic);
+        POSTRequest asyncHttpPost = new POSTRequest(data);
+        try {
+			String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/UnsubscribeTopic").get();
+			Gson gson = new Gson(); 
+			UnsubscribeTopicResult i = gson.fromJson(str_result, UnsubscribeTopicResult.class);
+			
+			return i.UnsubscribeTopicResult;
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;    
+		
+	}
 
+	/**
+     * @return Application's {@code SharedPreferences}.
+     */
+    private SharedPreferences getGCMPreferences(Context context) {
+        return getSharedPreferences(TopicPageActivity.class.getSimpleName(), Context.MODE_PRIVATE);
+    }
 }
