@@ -279,7 +279,7 @@ namespace PushNotificationService
             var database = server.GetDatabase("pushNotification");
             var searchTermCollection = database.GetCollection("Topics");
 
-            var sort = SortBy.Ascending("NumberOfSubscribers");
+            var sort = SortBy.Descending("NumberOfSubscribers");
 
             try
             {
