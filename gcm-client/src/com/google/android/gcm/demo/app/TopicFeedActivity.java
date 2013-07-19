@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.Date;
-
-import com.google.android.gcm.demo.app.AddTopicActivity.result;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import android.app.Activity;
@@ -53,9 +51,11 @@ public class TopicFeedActivity extends Activity {
         public String Url;
     }
 	
-	class result {    	
-    	int DeleteTopicResult;
+	class UnsubscribeTopicResult {    	
+    	int UnsubscribeTopicResult;
     }
+	
+	public static final String PROPERTY_REG_ID = "registration_id";
 	
 	/* Menu Code */
 	
@@ -95,16 +95,27 @@ public class TopicFeedActivity extends Activity {
 				.setCancelable(false)
 				.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
+						
+						Context context = getApplicationContext();
+						final SharedPreferences prefs = getGCMPreferences(context);
+				        String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
+						int removeTopicResult = deleteTopicFromServer(registrationId, topic);
+						
 						AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
 								TopicFeedActivity.this);
+						
+						if(removeTopicResult == 0){
+							alertDialogBuilderConfirm.setMessage("Topic successfully removed!");
+						}else{				
+							alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
+						}
+						
 						alertDialogBuilderConfirm
 						.setMessage("Topic Removed!")
 						.setCancelable(false)
 						.setNegativeButton("OK",new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,int id) {
 								dialog.cancel();
-								String regid = new TopicPageActivity().getRegistrationId(getApplicationContext());
-								deleteTopicFromServer(regid, topic);
 								Intent mIntent = new Intent(TopicFeedActivity.this, TopicPageActivity.class);
 					        	startActivity(mIntent);
 							}							
@@ -212,32 +223,33 @@ public class TopicFeedActivity extends Activity {
         listview.setAdapter(adapter);        
 	}
 	
-	private void deleteTopicFromServer(String regid, String topic) {
-		
-		Context context = getApplicationContext();  
-        
+	private int deleteTopicFromServer(String regid, String topic) {
+		        
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("regId", regid);
         data.put("topic", topic);
         POSTRequest asyncHttpPost = new POSTRequest(data);
         try {
-			String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/DeleteTopic").get();
+			String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/UnsubscribeTopic").get();
 			Gson gson = new Gson(); 
-			result i = gson.fromJson(str_result, result.class);
+			UnsubscribeTopicResult i = gson.fromJson(str_result, UnsubscribeTopicResult.class);
 			
-			if(i.DeleteTopicResult == 0){
-				//Topic successfully deleted
-			}else{				
-				//Error removing topic
-			}		
+			return i.UnsubscribeTopicResult;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}    
+		}
+		return -1;    
 		
 	}
 
+	/**
+     * @return Application's {@code SharedPreferences}.
+     */
+    private SharedPreferences getGCMPreferences(Context context) {
+        return getSharedPreferences(TopicPageActivity.class.getSimpleName(), Context.MODE_PRIVATE);
+    }
 }

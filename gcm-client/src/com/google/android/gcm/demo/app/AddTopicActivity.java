@@ -132,8 +132,8 @@ public class AddTopicActivity extends Activity {
 	        popularTopics();
 	    }
 
-	 class result {    	
-	    	int RegisterResult;
+	 class SubscribeTopicResult {    	
+	    	int SubscribeTopicResult;
 	    }
 	 
 	 @Override
@@ -156,11 +156,11 @@ public class AddTopicActivity extends Activity {
 	        try {
 				String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/SubscribeTopic").get();
 				Gson gson = new Gson(); 
-				result i = gson.fromJson(str_result, result.class);
+				SubscribeTopicResult i = gson.fromJson(str_result, SubscribeTopicResult.class);
 				
 				AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
 						AddTopicActivity.this);
-				if(i.RegisterResult == 0){
+				if(i.SubscribeTopicResult == 0){
 					alertDialogBuilderConfirm.setMessage("Topic successfully added!");
 				}else{				
 					alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
@@ -199,7 +199,8 @@ public class AddTopicActivity extends Activity {
         
         GetPopularTopicsResult topiclist = new GetPopularTopicsResult();
         
-        HashMap<String, String> param = new HashMap<String, String>();        
+        HashMap<String, String> param = new HashMap<String, String>();  
+        param.put("regId", registrationId);
         POSTRequest asyncHttpPost = new POSTRequest(param);
         try {
 	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetPopularTopics").get();
@@ -211,7 +212,7 @@ public class AddTopicActivity extends Activity {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
         
         List<Map<String, String>> data = new ArrayList<Map<String, String>>();        	
         for (Topic topic : topiclist.GetPopularTopicsResult){
