@@ -11,6 +11,7 @@ using PushSharp.Apple;
 using PushSharp.Core;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq;
 using MongoDB.Bson;
 using System.Threading;
 using System.Text.RegularExpressions;
@@ -101,11 +102,15 @@ namespace PushNotificationService
         {
             try
             {
-                IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
-                IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId)
-                    .Inc(t => t.NumberOfSubscribers, 1);
-                
-                CollectionTopics.Update(query, update, UpdateFlags.Upsert);
+
+                var result = CollectionTopics.AsQueryable<Topic>()
+                    .Where(t => t.Name == topic && t.RegIds.Contains(regId));
+                if (result.Count() == 0)
+                {
+                    IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
+                    IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId);
+                    CollectionTopics.Update(query, update, UpdateFlags.Upsert);
+                }
             }
             catch (Exception e)
             {
@@ -118,11 +123,16 @@ namespace PushNotificationService
         {
             try
             {
-                IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
-                IMongoUpdate update = Update<Topic>.Pull(t => t.RegIds, regId)
-                    .Inc(t => t.NumberOfSubscribers, -1);
+                var result = CollectionTopics.AsQueryable<Topic>()
+                    .Where(t => t.Name == topic && t.RegIds.Contains(regId));
+                if (result.Count() > 0)
+                {
+                    IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
+                    IMongoUpdate update = Update<Topic>.Pull(t => t.RegIds, regId)
+                        .Inc(t => t.NumberOfSubscribers, -1);
 
-                CollectionTopics.Update(query, update);
+                    CollectionTopics.Update(query, update);
+                }
             }
             catch (Exception e)
             {
@@ -234,14 +244,14 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
+            var searchTermCollection = database.GetCollection("Topics");
 
             try
             {
                 var result = searchTermCollection.FindAll();
                 foreach (var doc in result)
                 {
-                    topics.Add(doc["searchTerm"].ToString());
+                    topics.Add(doc["Name"].ToString());
                 }
 
                 return topics;
