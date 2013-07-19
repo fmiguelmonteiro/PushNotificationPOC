@@ -18,13 +18,14 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://localhost:54010/PushNotificationService.svc/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="http://localhost:58145/PushNotificationService.svc/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="7a4739a9-8220-49ab-b436-3ee64f526787" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="ade46f2b-09c2-4ca2-aa7b-df5643722aa2" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="6df72d54-37c3-44c3-98c7-83d2acf8530d" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
-    <MetadataFile FileName="PushNotificationService.xsd" MetadataType="Schema" ID="b8721405-3f6d-4e51-a56e-5e45b1c053a0" SourceId="1" SourceUrl="http://localhost:54010/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="service1.wsdl" MetadataType="Wsdl" ID="0ceacb4e-f28c-4730-9509-2ac276aa57ca" SourceId="1" SourceUrl="http://localhost:58145/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="service2.xsd" MetadataType="Schema" ID="473d93ac-cdeb-49d2-9956-0886ed62d282" SourceId="1" SourceUrl="http://localhost:58145/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="service21.xsd" MetadataType="Schema" ID="ac16591f-b811-43b2-879e-89ffbd16d521" SourceId="1" SourceUrl="http://localhost:58145/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="e9649627-443b-4139-8bcf-7c0ab963d45a" SourceId="1" SourceUrl="http://localhost:58145/PushNotificationService.svc/mex" />
+    <MetadataFile FileName="PushNotificationService1.xsd" MetadataType="Schema" ID="a183f609-8174-423b-a2ca-b3ae2e300a3c" SourceId="1" SourceUrl="http://localhost:58145/PushNotificationService.svc/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

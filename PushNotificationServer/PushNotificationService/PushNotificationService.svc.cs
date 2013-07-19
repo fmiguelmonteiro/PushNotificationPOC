@@ -13,6 +13,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Bson;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 
 namespace PushNotificationService
@@ -39,7 +40,13 @@ namespace PushNotificationService
                     foreach (var doc in searchTerms)
                     {
                         var searchTerm = doc["searchTerm"].ToString();
-                        var messages = messagesCollection.Find(Query.And(Query.Matches("text", searchTerm), Query.EQ("notified", false)));
+
+                        var messages = messagesCollection.Find(
+                            Query.And(
+                                Query.Matches("text", BsonRegularExpression.Create(new Regex(searchTerm, RegexOptions.IgnoreCase))), 
+                                Query.EQ("notified", false)
+                            )
+                        );
 
                         if (messages.Count() > 0)
                         {
@@ -49,7 +56,7 @@ namespace PushNotificationService
                             {
                                 push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
                                 push.QueueNotification(new GcmNotification().ForDeviceRegistrationId(regId.ToString())
-                                                     .WithJson("{\"message\":\" " + messages.Count() + " new messages for topic " + searchTerm + " \",\"badge\":7,\"sound\":\"sound.caf\"}"));
+                                                     .WithJson("{\"topic\":\"" + searchTerm + "\", \"newMessages\":\"" + messages.Count() + "\",\"badge\":7,\"sound\":\"sound.caf\"}"));
 
                             }
                         }
@@ -97,10 +104,14 @@ namespace PushNotificationService
             var database = server.GetDatabase("pushNotification");
             var messagesCollection = database.GetCollection("Messages");
 
+            
 
             try
             {
-                var modules = messagesCollection.Find(Query.Matches("text", searchTerm));
+                var modules = messagesCollection.Find(
+                        Query.Matches("text", BsonRegularExpression.Create(new Regex(searchTerm, RegexOptions.IgnoreCase)))
+                    ).SetSortOrder(SortBy.Descending("date"));
+
                 foreach (var doc in modules)
                 {
                     messages.Add(new Message
@@ -108,7 +119,8 @@ namespace PushNotificationService
                         Id = doc["_id"].ToString(),
                         Text = doc["text"].ToString(),
                         Title = doc["title"].ToString(),
-                        Url = doc["url"] != null ? doc["url"].ToString() : ""
+                        Url = doc["url"].IsBsonNull ? "" :doc["url"].ToString(),
+                        Date = doc["date"].IsBsonNull ? DateTime.MinValue.ToString("yyyy-MM-dd'T'HH:mm:ssz") : DateTime.Parse(doc["date"].ToString()).ToString("yyyy-MM-dd'T'HH:mm:ssz")
                     });
                 }
 

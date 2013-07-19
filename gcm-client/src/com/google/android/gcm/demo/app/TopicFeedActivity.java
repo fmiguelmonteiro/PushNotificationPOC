@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.Date;
 
 import org.apache.http.HttpResponse;
 
 import com.google.android.gms.internal.bs;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,7 +51,8 @@ public class TopicFeedActivity extends Activity {
 	class Message
     {
         public String Id;           
-        public String Title;                
+        public String Title;   
+        public Date Date;
         public String Text;
         public String Url;
     }
@@ -160,7 +163,9 @@ public class TopicFeedActivity extends Activity {
         POSTRequest asyncHttpPost = new POSTRequest(param);
         try {
 	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetMessages").get();
-			Gson gson = new Gson(); 
+	        Gson gson = new GsonBuilder()
+	        .setDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
+	        .create();
 			messagelist = gson.fromJson(str_result, GetMessagesResult.class);        
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -173,17 +178,24 @@ public class TopicFeedActivity extends Activity {
         List<Map<String, String>> data = new ArrayList<Map<String, String>>();        	
         for (Message mess : messagelist.GetMessagesResult){
         	Map<String, String> list = new HashMap<String, String>(2);
-        	list.put("title", mess.Title);
-        	list.put("description", mess.Text);
+        	list.put("line1", mess.Title);
+        	list.put("line2", mess.Text);
         	list.put("url", mess.Url);
+        	
+        	long diff = (new java.util.Date()).getTime() - mess.Date.getTime();
+        	long diffSeconds = diff / 1000 % 60;  
+        	long diffMinutes = diff / (60 * 1000) % 60;        
+            long diffHours = diff / (60 * 60 * 1000);  
+            
+            list.put("line3", diffHours + " hours, " + diffMinutes + " minutes and " + diffSeconds + " seconds ago");
+        	
         	data.add(list);
         }
         
         SimpleAdapter adapter = new SimpleAdapter(this, data,
-                android.R.layout.simple_list_item_2,
-                new String[] {"title", "description"},
-                new int[] {android.R.id.text1,
-                           android.R.id.text2});
+        	    R.layout.multi_lines,
+        	    new String[] { "line1","line2", "line3" },
+        	    new int[] {R.id.line_a, R.id.line_b, R.id.line_c});
         
         listview.setOnItemClickListener(new OnItemClickListener()
         {

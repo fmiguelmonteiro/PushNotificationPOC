@@ -63,6 +63,9 @@
     <Reference Include="PushSharp.WindowsPhone">
       <HintPath>..\lib\PushSharp.WindowsPhone.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\lib\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -102,7 +105,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -112,17 +117,23 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Service References\PushNotificationService\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\PushNotificationService\ClientTest.PushNotificationService.Message.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\PushNotificationService\PushNotificationService.xsd">
+    <None Include="Service References\PushNotificationService\ClientTest.PushNotificationService.Topic.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\PushNotificationService\PushNotificationService1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\PushNotificationService\service.wsdl" />
-    <None Include="Service References\PushNotificationService\service.xsd">
+    <None Include="Service References\PushNotificationService\service1.wsdl" />
+    <None Include="Service References\PushNotificationService\service2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\PushNotificationService\service1.xsd">
+    <None Include="Service References\PushNotificationService\service21.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

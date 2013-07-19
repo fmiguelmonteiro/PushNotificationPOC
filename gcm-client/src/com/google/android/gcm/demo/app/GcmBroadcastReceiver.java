@@ -21,10 +21,13 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.google.android.gcm.demo.app.DemoActivity.GetSubscribedTopicsResult;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
 
 /**
  * Handling of GCM messages.
@@ -35,26 +38,42 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     Context ctx;
+    
+    class PushNotificationServiceResult
+    {    	
+    	String topic;
+    	Integer newMessages;
+    	String badge;
+    	String sound;    	
+    }
+    
     @Override
     public void onReceive(Context context, Intent intent) {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
         ctx = context;
         String messageType = gcm.getMessageType(intent);
         if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-            sendNotification("Send error: " + intent.getExtras().toString());
+            //sendNotification("Send error: " + intent.getExtras().toString());
         } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-            sendNotification("Deleted messages on server: " + intent.getExtras().toString());
+            //sendNotification("Deleted messages on server: " + intent.getExtras().toString());
         } else {
-            sendNotification("Received: " + intent.getExtras().toString());
+            sendNotification(intent.getExtras());
         }
         setResultCode(Activity.RESULT_OK);
     }
 
     // Put the GCM message into a notification and post it.
-    private void sendNotification(String msg) {
+    private void sendNotification(Bundle msg) {
     	Log.v(TAG, "mesage: " + msg);
         mNotificationManager = (NotificationManager)
                 ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                
+        String topic = msg.getString("topic");
+        String nmessages = msg.getString("newMessages");
+        
+        Intent mIntent = new Intent(ctx, TopicFeedActivity.class);
+        mIntent.putExtra("FeedName", topic); 
+
 
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
                 new Intent(ctx, TopicPageActivity.class), 0);
@@ -62,10 +81,11 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
         .setSmallIcon(R.drawable.ic_stat_gcm)
-        .setContentTitle("GCM Notification")
+        .setContentTitle("Push POC")
+        .setAutoCancel(true)
         .setStyle(new NotificationCompat.BigTextStyle()
-        .bigText(msg))
-        .setContentText(msg);
+        .bigText(message))
+        .setContentText(message);
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
