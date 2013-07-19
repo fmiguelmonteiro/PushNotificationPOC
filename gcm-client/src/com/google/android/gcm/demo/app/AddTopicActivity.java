@@ -193,15 +193,6 @@ public class AddTopicActivity extends Activity {
 	 
 	private void popularTopics() {
 		final ListView listview = (ListView) findViewById(R.id.listViewAddTopic);
-    	
-    	//get TOPICS!
-        //String[] values = new String[] { "PopularTopic1", "PopularTopic2", "PopularTopic3" };
-        ////
-        
-        //final ArrayList<String> list = new ArrayList<String>();
-        //for (int i = 0; i < values.length; ++i) {
-        //  list.add(values[i]);
-        //} 	
         
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
