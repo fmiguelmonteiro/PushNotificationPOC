@@ -267,9 +267,9 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
+            var searchTermCollection = database.GetCollection("Topics");
 
-            var sort = SortBy.Ascending("nOfSubscribers");
+            var sort = SortBy.Ascending("NumberOfSubscribers");
 
             try
             {
@@ -278,8 +278,8 @@ namespace PushNotificationService
                 {
                     topics.Add(new Topic()
                     {
-                        Name = doc["searchTerm"].ToString(),
-                        NumberOfSubscribers = doc["nOfSubscribers"].ToInt32(),
+                        Name = doc["Name"].ToString(),
+                        NumberOfSubscribers = doc["NumberOfSubscribers"].ToInt32(),
                         Id = doc["_id"].ToString(),
                     });
                 }
