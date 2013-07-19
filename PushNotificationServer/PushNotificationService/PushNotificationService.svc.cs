@@ -108,7 +108,8 @@ namespace PushNotificationService
                 if (result.Count() == 0)
                 {
                     IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
-                    IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId);
+                    IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId)
+                        .Inc(t => t.NumberOfSubscribers, 1);
                     CollectionTopics.Update(query, update, UpdateFlags.Upsert);
                 }
             }
@@ -273,21 +274,10 @@ namespace PushNotificationService
             if (userSettings != null)
                 topPopuparTopics = userSettings.TopPopuparTopics;
 
-            var client = new MongoClient("mongodb://10.4.0.133");
-            var server = client.GetServer();
-
-            var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("Topics");
-
-            var sort = SortBy.Descending("NumberOfSubscribers");
-
-
-
             try
             {
-                //var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(topPopuparTopics);
                 var result = CollectionTopics.AsQueryable<Topic>()
-                    .Where(t => !t.RegIds.Contains(regId))
+                    //.Where(t => !t.RegIds.Contains(regId))
                     .OrderByDescending(t => t.NumberOfSubscribers)
                     .Take(topPopuparTopics);
                 foreach (var doc in result)
