@@ -18,8 +18,16 @@ namespace PushNotificationService
             ResponseFormat = WebMessageFormat.Json,
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
-            UriTemplate = "Register")]
-        int SubscribeTopic(string regId, string searchTerm);
+            UriTemplate = "SubscribeTopic")]
+        int SubscribeTopic(string regId, string topic);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            ResponseFormat = WebMessageFormat.Json,
+            RequestFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "UnsubscribeTopic")]
+        int UnsubscribeTopic(string regId, string topic);
 
         [OperationContract]
         [WebInvoke(Method = "POST",
@@ -164,7 +172,14 @@ namespace PushNotificationService
         }
 
         [DataMember]
-        public string NumberOfSubscribers
+        public int NumberOfSubscribers
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
+        public List<string> RegIds
         {
             get;
             set;

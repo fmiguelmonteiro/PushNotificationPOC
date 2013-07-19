@@ -35,6 +35,17 @@ namespace PushNotificationService
             }
         }
 
+        private MongoCollection<Topic> collectionTopics = null;
+        private MongoCollection<Topic> CollectionTopics
+        {
+            get
+            {
+                if (collectionTopics == null)
+                    collectionTopics = mongoDB.GetCollection<Topic>("Topics");
+                return collectionTopics;
+            }
+        }
+
         static PushNotificationService()
         {
             var thread = new Thread(() =>
@@ -44,7 +55,7 @@ namespace PushNotificationService
                     var server = client.GetServer();
 
                     var database = server.GetDatabase("pushNotification");
-                    var searchTermCollection = database.GetCollection("SearchTerm");
+                    var searchTermCollection = database.GetCollection("Topics");
 
                     var messagesCollection = database.GetCollection("Messages");
 
@@ -52,7 +63,7 @@ namespace PushNotificationService
                     var searchTerms = searchTermCollection.FindAll();
                     foreach (var doc in searchTerms)
                     {
-                        var searchTerm = doc["searchTerm"].ToString();
+                        var searchTerm = doc["Name"].ToString();
 
                         var messages = messagesCollection.Find(
                             Query.And(
@@ -64,7 +75,7 @@ namespace PushNotificationService
                         if (messages.Count() > 0)
                         {
 
-                            var regIds = doc["regIds"];
+                            var regIds = doc["RegIds"];
                             foreach (var regId in regIds.AsBsonArray)
                             {
                                 push.RegisterGcmService(new GcmPushChannelSettings("AIzaSyCRdVTZUqfHX7kCQWYAZWYoUXBEEwKZ-kA"));
@@ -86,25 +97,56 @@ namespace PushNotificationService
             thread.Start();
         }
 
-        public int SubscribeTopic(string regId, string searchTerm)
+        public int SubscribeTopic(string regId, string topic)
         {
-            var client = new MongoClient("mongodb://10.4.0.133");
-            var server = client.GetServer();
-
-            var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
-
-            var searchTerms = searchTermCollection.FindAll();
-
             try
             {
-                searchTermCollection.Update(Query.EQ("searchTerm", searchTerm), Update.AddToSet("regIds", regId).Inc("nOfSubscribers", 1), UpdateFlags.Upsert);
-                return 0;
+                IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
+                IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId)
+                    .Inc(t => t.NumberOfSubscribers, 1);
+                
+                CollectionTopics.Update(query, update, UpdateFlags.Upsert);
             }
             catch (Exception e)
             {
                 return -1;
             }
+            return 0;
+        }
+
+        public int UnsubscribeTopic(string regId, string topic)
+        {
+            try
+            {
+                IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
+                IMongoUpdate update = Update<Topic>.Pull(t => t.RegIds, regId)
+                    .Inc(t => t.NumberOfSubscribers, -1);
+
+                CollectionTopics.Update(query, update);
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
+            return 0;
+
+            //var client = new MongoClient("mongodb://10.4.0.133");
+            //var server = client.GetServer();
+
+            //var database = server.GetDatabase("pushNotification");
+            //var searchTermCollection = database.GetCollection("SearchTerm");
+
+            //var searchTerms = searchTermCollection.FindAll();
+
+            //try
+            //{
+            //    searchTermCollection.Update(Query.EQ("searchTerm", topic), Update.AddToSet("regIds", regId).Inc("nOfSubscribers", 1), UpdateFlags.Upsert);
+            //    return 0;
+            //}
+            //catch (Exception e)
+            //{
+            //    return -1;
+            //}
         }
 
         public List<Message> GetMessages(string searchTerm)
@@ -150,8 +192,6 @@ namespace PushNotificationService
             var client = new MongoClient("mongodb://10.4.0.133");
             var server = client.GetServer();
             var database = server.GetDatabase("pushNotification");
-
-            var searchTermCollection = database.GetCollection("SearchTerm");
 
             var messagesCollection = database.GetCollection("Messages");
             try
@@ -257,7 +297,7 @@ namespace PushNotificationService
                     topics.Add(new Topic()
                     {
                         Name = doc["searchTerm"].ToString(),
-                        NumberOfSubscribers = doc["nOfSubscribers"].ToString(),
+                        NumberOfSubscribers = doc["nOfSubscribers"].ToInt32(),
                         Id = doc["_id"].ToString(),
                     });
                 }
@@ -281,7 +321,8 @@ namespace PushNotificationService
             try
             {
                 IMongoQuery query = Query<UserSettings>.EQ(s => s.RegId, settings.RegId);
-                IMongoUpdate update = Update<UserSettings>.Set(s => s.RegId, settings.RegId).Set(s => s.TopPopuparTopics, settings.TopPopuparTopics); // update modifiers
+                IMongoUpdate update = Update<UserSettings>.Set(s => s.RegId, settings.RegId)
+                    .Set(s => s.TopPopuparTopics, settings.TopPopuparTopics);
                 CollectionUserSettings.Update(query, update, UpdateFlags.Upsert);
             }
             catch (Exception e)
