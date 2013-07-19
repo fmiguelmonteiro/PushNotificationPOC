@@ -277,7 +277,7 @@ namespace PushNotificationService
             try
             {
                 var result = CollectionTopics.AsQueryable<Topic>()
-                    //.Where(t => !t.RegIds.Contains(regId))
+                    .Where(t => !t.RegIds.Contains(regId))
                     .OrderByDescending(t => t.NumberOfSubscribers)
                     .Take(topPopuparTopics);
                 foreach (var doc in result)
