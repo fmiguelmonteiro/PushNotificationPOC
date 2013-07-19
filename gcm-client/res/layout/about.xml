@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/LinearLayoutAbout"
+      android:layout_width="match_parent"
+      android:layout_height="518dp"
+      android:orientation="vertical" >
+      
+    <TextView
+            android:id="@+id/textViewAbout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:paddingTop="8dip"
+            android:text="About"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+        
+    <TextView
+            android:id="@+id/textViewAboutInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:paddingTop="8dip"
+            android:text="Push Poc v0.1">
+        </TextView>
+        
+ </LinearLayout>

@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/LinearLayoutAddTopicHelp"
+      android:layout_width="match_parent"
+      android:layout_height="518dp"
+      android:orientation="vertical" >
+      
+    <TextView
+            android:id="@+id/textViewAddTopicHelp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:paddingTop="8dip"
+            android:text="Help"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+        
+    <TextView
+            android:id="@+id/textViewTopicAddTopicHelpInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip"
+            android:paddingTop="8dip"
+            android:text="In this page you can add new topics and check out the most popular current topics.">
+        </TextView>
+        
+ </LinearLayout>
