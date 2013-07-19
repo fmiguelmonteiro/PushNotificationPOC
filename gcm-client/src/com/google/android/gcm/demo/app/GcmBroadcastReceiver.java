@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gcm.demo.app.DemoActivity.GetSubscribedTopicsResult;
+import com.google.android.gcm.demo.app.TopicPageActivity.GetSubscribedTopicsResult;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 
@@ -77,6 +77,8 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
                 new Intent(ctx, TopicPageActivity.class), 0);
+        
+        String message = "There are " + nmessages + " new alerts for " + topic;
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
