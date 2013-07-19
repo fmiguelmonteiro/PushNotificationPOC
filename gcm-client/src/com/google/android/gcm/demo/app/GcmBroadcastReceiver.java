@@ -21,13 +21,13 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gcm.demo.app.TopicPageActivity.GetSubscribedTopicsResult;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.gson.Gson;
 
 /**
  * Handling of GCM messages.
@@ -76,10 +76,12 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 
 
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-                new Intent(ctx, TopicPageActivity.class), 0);
+        		mIntent, 0);
         
         String message = "There are " + nmessages + " new alerts for " + topic;
-
+        
+        Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+              
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
         .setSmallIcon(R.drawable.ic_stat_gcm)
@@ -87,7 +89,10 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
         .setAutoCancel(true)
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(message))
+        .setSound(uri)
         .setContentText(message);
+        
+        
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
