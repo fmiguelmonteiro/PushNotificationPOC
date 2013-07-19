@@ -129,24 +129,6 @@ namespace PushNotificationService
                 return -1;
             }
             return 0;
-
-            //var client = new MongoClient("mongodb://10.4.0.133");
-            //var server = client.GetServer();
-
-            //var database = server.GetDatabase("pushNotification");
-            //var searchTermCollection = database.GetCollection("SearchTerm");
-
-            //var searchTerms = searchTermCollection.FindAll();
-
-            //try
-            //{
-            //    searchTermCollection.Update(Query.EQ("searchTerm", topic), Update.AddToSet("regIds", regId).Inc("nOfSubscribers", 1), UpdateFlags.Upsert);
-            //    return 0;
-            //}
-            //catch (Exception e)
-            //{
-            //    return -1;
-            //}
         }
 
         public List<Message> GetMessages(string searchTerm)
@@ -223,16 +205,16 @@ namespace PushNotificationService
             var server = client.GetServer();
 
             var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("SearchTerm");
+            var searchTermCollection = database.GetCollection("Topics");
 
 
             try
             {
                 var array = new List<string>() { regId };
-                var result = searchTermCollection.Find(Query.In("regIds", BsonArray.Create(array)));
+                var result = searchTermCollection.Find(Query.In("RegIds", BsonArray.Create(array)));
                 foreach (var doc in result)
                 {
-                    topics.Add(doc["searchTerm"].ToString());
+                    topics.Add(doc["Name"].ToString());
                 }
 
                 return topics;
