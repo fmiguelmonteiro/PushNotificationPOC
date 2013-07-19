@@ -162,7 +162,7 @@ public class TopicFeedActivity extends Activity {
         param.put("searchTerm", topic);
         POSTRequest asyncHttpPost = new POSTRequest(param);
         try {
-	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetMessages").get();
+	        String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/GetMessages").get();
 	        Gson gson = new GsonBuilder()
 	        .setDateFormat("yyyy-MM-dd'T'HH:mm:ssz")
 	        .create();

@@ -43,7 +43,7 @@ namespace PushNotificationService
             RequestFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "GetPopularTopics")]
-        List<Topic> GetPopularTopics();
+        List<Topic> GetPopularTopics(string regId);
 
         [OperationContract]
         [WebInvoke(Method = "POST",
@@ -98,7 +98,7 @@ namespace PushNotificationService
         }
 
         [DataMember]
-        public string NumberOfPopuparTopics
+        public int TopPopuparTopics
         {
             get;
             set;

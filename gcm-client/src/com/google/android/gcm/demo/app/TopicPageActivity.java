@@ -193,7 +193,7 @@ public class TopicPageActivity extends Activity {
         param.put("regId", registrationId);
         POSTRequest asyncHttpPost = new POSTRequest(param);
         try {
-	        String str_result = asyncHttpPost.execute("http://10.0.2.2:58145/PushNotificationService.svc/GetSubscribedTopics").get();
+	        String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/GetSubscribedTopics").get();
 			Gson gson = new Gson(); 
 			topiclist = gson.fromJson(str_result, GetSubscribedTopicsResult.class);        
 		} catch (InterruptedException e) {
