@@ -231,12 +231,15 @@ namespace PushNotificationService
         }
 
 
-        public List<Topic> GetPopularTopics()
+        public List<Topic> GetPopularTopics(string regId)
         {
-            int top = 20;
-            bool ascending = true;
-
             List<Topic> topics = new List<Topic>();
+
+            int topPopuparTopics = 10;
+            IMongoQuery query = Query<UserSettings>.EQ(e => e.RegId, regId);
+            UserSettings userSettings = CollectionUserSettings.FindOne(query);
+            if (userSettings != null)
+                topPopuparTopics = userSettings.TopPopuparTopics;
 
             var client = new MongoClient("mongodb://10.4.0.133");
             var server = client.GetServer();
@@ -245,14 +248,10 @@ namespace PushNotificationService
             var searchTermCollection = database.GetCollection("SearchTerm");
 
             var sort = SortBy.Ascending("nOfSubscribers");
-            if (!ascending)
-            {
-                sort = SortBy.Descending("nOfSubscribers");
-            }
 
             try
             {
-                var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(top);
+                var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(topPopuparTopics);
                 foreach (var doc in result)
                 {
                     topics.Add(new Topic()
@@ -262,13 +261,12 @@ namespace PushNotificationService
                         Id = doc["_id"].ToString(),
                     });
                 }
-
-                return topics;
             }
             catch (Exception e)
             {
-                return topics;
+                return new List<Topic>();
             }
+            return topics;
         }
 
 
@@ -282,7 +280,9 @@ namespace PushNotificationService
         {
             try
             {
-                CollectionUserSettings.Insert(settings);
+                IMongoQuery query = Query<UserSettings>.EQ(s => s.RegId, settings.RegId);
+                IMongoUpdate update = Update<UserSettings>.Set(s => s.RegId, settings.RegId).Set(s => s.TopPopuparTopics, settings.TopPopuparTopics); // update modifiers
+                CollectionUserSettings.Update(query, update, UpdateFlags.Upsert);
             }
             catch (Exception e)
             {
