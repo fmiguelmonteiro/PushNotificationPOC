@@ -9,7 +9,7 @@ import java.util.Date;
 
 import org.apache.http.HttpResponse;
 
-import com.google.android.gcm.demo.app.DemoActivity.result;
+import com.google.android.gms.internal.bs;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,13 +19,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 public class TopicFeedActivity extends Activity {
 	class Result {
@@ -48,11 +54,12 @@ public class TopicFeedActivity extends Activity {
         public String Title;   
         public Date Date;
         public String Text;
+        public String Url;
     }
 	
 	/* Menu Code */
 	
-	/*public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.topicfeedmenu, menu);
 	    return true;
@@ -60,20 +67,18 @@ public class TopicFeedActivity extends Activity {
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		    case R.id.about:
-		    //startActivity(new Intent(this, About.class));
+		    case R.id.helpTopicFeed:
+		    	Intent helpIntent = new Intent(TopicFeedActivity.this, TopicFeedHelpActivity.class);
+	        	startActivity(helpIntent);
 		    return true;
-		    case R.id.help:
-		    //startActivity(new Intent(this, Help.class));
-		    return true;
-		    case R.id.remove:
+		    case R.id.removeTopicFeed:
 			    removeTopic();
 			return true;
 		    default:
 		    return super.onOptionsItemSelected(item);
 		}
 		
-	}*/
+	}
 	
 	private void removeTopic() {
 		String topic = getIntent().getExtras().getString("FeedName");
@@ -103,7 +108,7 @@ public class TopicFeedActivity extends Activity {
 								// if this button is clicked, just close
 								// the dialog box and do nothing
 								dialog.cancel();
-								Intent mIntent = new Intent(TopicFeedActivity.this, DemoActivity.class);
+								Intent mIntent = new Intent(TopicFeedActivity.this, TopicPageActivity.class);
 								mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					        	startActivity(mIntent);
 							}
@@ -143,12 +148,12 @@ public class TopicFeedActivity extends Activity {
         
         TextView cenas = (TextView)findViewById(R.id.TopicfeedText1);
         
-        cenas.setText(topic);            
-       
-        currentTopics(topic);
-    }      
+        cenas.setText(topic);        
 
-	private void currentTopics(String topic) {
+        currentTopicFeed(topic);
+    }
+
+	private void currentTopicFeed(String topic) {
 		final ListView listview = (ListView) findViewById(R.id.TopicFeedlistView1);
         
         GetMessagesResult messagelist = new GetMessagesResult();
@@ -175,7 +180,7 @@ public class TopicFeedActivity extends Activity {
         	Map<String, String> list = new HashMap<String, String>(2);
         	list.put("line1", mess.Title);
         	list.put("line2", mess.Text);
-        	
+        	list.put("url", mess.Url);
         	
         	long diff = (new java.util.Date()).getTime() - mess.Date.getTime();
         	long diffSeconds = diff / 1000 % 60;  
@@ -186,14 +191,31 @@ public class TopicFeedActivity extends Activity {
         	
         	data.add(list);
         }
-       
         
         SimpleAdapter adapter = new SimpleAdapter(this, data,
         	    R.layout.multi_lines,
         	    new String[] { "line1","line2", "line3" },
         	    new int[] {R.id.line_a, R.id.line_b, R.id.line_c});
         
-        
+        listview.setOnItemClickListener(new OnItemClickListener()
+        {
+		        public void onItemClick(AdapterView<?> arg0, View v, int position, long id)
+		        {      
+		        	WebView wView = new WebView(TopicFeedActivity.this);
+		        	wView.getSettings().setJavaScriptEnabled(true);
+		        	Map<String, String> item = (Map<String, String>)arg0.getItemAtPosition(position);
+		              	
+		        	if(item.get("url") !=  null && item.get("url") != ""){
+		        		wView.loadUrl(item.get("url"));
+		        	}
+		        	else{
+		        		//display in short period of time
+		        		Toast.makeText(getApplicationContext(), "This feed has no URL!", Toast.LENGTH_SHORT).show();
+		        	}
+		      
+                }
+         });
         listview.setAdapter(adapter);        
 	}
+
 }

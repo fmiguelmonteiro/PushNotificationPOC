@@ -218,8 +218,11 @@ namespace PushNotificationService
         }
 
 
-        public List<Topic> GetPopularTopics(int top, bool ascending)
+        public List<Topic> GetPopularTopics()
         {
+            int top = 20;
+            bool ascending = true;
+
             List<Topic> topics = new List<Topic>();
 
             var client = new MongoClient("mongodb://10.4.0.133");
