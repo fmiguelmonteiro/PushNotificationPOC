@@ -312,7 +312,11 @@ public class TopicPageActivity extends Activity {
 
             @Override
             protected void onPostExecute(String msg) {
-                mDisplay.append(msg + "\n");
+                if(!"".equals(msg)){
+                    if(mDisplay != null){
+                        mDisplay.append(msg + "\n");
+                    }
+                }
             }
         }.execute(null, null, null);
     }
