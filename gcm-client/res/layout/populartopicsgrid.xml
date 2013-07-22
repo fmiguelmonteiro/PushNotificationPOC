@@ -11,6 +11,7 @@
         android:layout_weight="0.09"
         android:editable="false"
         android:inputType="none"
+        android:paddingTop="8dip"
         android:paddingBottom="8dip"
         android:paddingLeft="8dip"
         android:textAppearance="?android:attr/textAppearanceLarge"
