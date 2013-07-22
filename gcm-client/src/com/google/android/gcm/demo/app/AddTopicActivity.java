@@ -132,8 +132,8 @@ public class AddTopicActivity extends Activity {
 	        popularTopics();
 	    }
 
-	 class SubscribeTopicResult {    	
-	    	int SubscribeTopicResult;
+	 class result {    	
+	    	int RegisterResult;
 	    }
 	 
 	 @Override
@@ -156,11 +156,11 @@ public class AddTopicActivity extends Activity {
 	        try {
 				String str_result = asyncHttpPost.execute("http://10.0.2.2/PushNotificationService/PushNotificationService.svc/SubscribeTopic").get();
 				Gson gson = new Gson(); 
-				SubscribeTopicResult i = gson.fromJson(str_result, SubscribeTopicResult.class);
+				result i = gson.fromJson(str_result, result.class);
 				
 				AlertDialog.Builder alertDialogBuilderConfirm = new AlertDialog.Builder(
 						AddTopicActivity.this);
-				if(i.SubscribeTopicResult == 0){
+				if(i.RegisterResult == 0){
 					alertDialogBuilderConfirm.setMessage("Topic successfully added!");
 				}else{				
 					alertDialogBuilderConfirm.setMessage("Oops something went wrong!");
@@ -193,13 +193,22 @@ public class AddTopicActivity extends Activity {
 	 
 	private void popularTopics() {
 		final ListView listview = (ListView) findViewById(R.id.listViewAddTopic);
+    	
+    	//get TOPICS!
+        //String[] values = new String[] { "PopularTopic1", "PopularTopic2", "PopularTopic3" };
+        ////
+        
+        //final ArrayList<String> list = new ArrayList<String>();
+        //for (int i = 0; i < values.length; ++i) {
+        //  list.add(values[i]);
+        //} 	
         
         final SharedPreferences prefs = getGCMPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");  
         
         GetPopularTopicsResult topiclist = new GetPopularTopicsResult();
         
-        HashMap<String, String> param = new HashMap<String, String>();  
+        HashMap<String, String> param = new HashMap<String, String>();       
         param.put("regId", registrationId);
         POSTRequest asyncHttpPost = new POSTRequest(param);
         try {
@@ -212,7 +221,7 @@ public class AddTopicActivity extends Activity {
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
         
         List<Map<String, String>> data = new ArrayList<Map<String, String>>();        	
         for (Topic topic : topiclist.GetPopularTopicsResult){

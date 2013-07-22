@@ -108,7 +108,8 @@ namespace PushNotificationService
                 if (result.Count() == 0)
                 {
                     IMongoQuery query = Query<Topic>.EQ(t => t.Name, topic);
-                    IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId);
+                    IMongoUpdate update = Update<Topic>.AddToSet(t => t.RegIds, regId)
+                        .Inc(t => t.NumberOfSubscribers, 1);
                     CollectionTopics.Update(query, update, UpdateFlags.Upsert);
                 }
             }
@@ -211,20 +212,15 @@ namespace PushNotificationService
         {
             List<string> topics = new List<string>();
 
-            var client = new MongoClient("mongodb://10.4.0.133");
-            var server = client.GetServer();
-
-            var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("Topics");
-
-
             try
             {
-                var array = new List<string>() { regId };
-                var result = searchTermCollection.Find(Query.In("RegIds", BsonArray.Create(array)));
+                var result = CollectionTopics.AsQueryable<Topic>()
+                .Where(t => t.RegIds.Contains(regId))
+                .OrderBy(t => t.Name);
+
                 foreach (var doc in result)
                 {
-                    topics.Add(doc["Name"].ToString());
+                    topics.Add(doc.Name);
                 }
 
                 return topics;
@@ -273,24 +269,19 @@ namespace PushNotificationService
             if (userSettings != null)
                 topPopuparTopics = userSettings.TopPopuparTopics;
 
-            var client = new MongoClient("mongodb://10.4.0.133");
-            var server = client.GetServer();
-
-            var database = server.GetDatabase("pushNotification");
-            var searchTermCollection = database.GetCollection("Topics");
-
-            var sort = SortBy.Descending("NumberOfSubscribers");
-
             try
             {
-                var result = searchTermCollection.FindAll().SetSortOrder(sort).SetLimit(topPopuparTopics);
+                var result = CollectionTopics.AsQueryable<Topic>()
+                    .Where(t => !t.RegIds.Contains(regId))
+                    .OrderByDescending(t => t.NumberOfSubscribers)
+                    .Take(topPopuparTopics);
                 foreach (var doc in result)
                 {
                     topics.Add(new Topic()
                     {
-                        Name = doc["Name"].ToString(),
-                        NumberOfSubscribers = doc["NumberOfSubscribers"].ToInt32(),
-                        Id = doc["_id"].ToString(),
+                        Name = doc.Name,
+                        NumberOfSubscribers = doc.NumberOfSubscribers,
+                        Id = doc.ObjectId.ToString()
                     });
                 }
             }
