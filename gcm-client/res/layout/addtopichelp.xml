@@ -22,7 +22,7 @@
             android:paddingLeft="8dip"
             android:paddingRight="8dip"
             android:paddingTop="8dip"
-            android:text="In this page you can add new topics and check out the most popular current topics.">
+            android:text="In this page you can add new topics and check out the most popular current topics.\nThe number appearing on the right is the number os suscribers to each topic.">
         </TextView>
         
  </LinearLayout>

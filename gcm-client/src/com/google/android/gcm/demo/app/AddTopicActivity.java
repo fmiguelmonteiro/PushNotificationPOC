@@ -232,10 +232,10 @@ public class AddTopicActivity extends Activity {
         }
         
         SimpleAdapter adapter = new SimpleAdapter(this, data,
-                android.R.layout.simple_list_item_2,
+                R.layout.populartopicsgrid,
                 new String[] {"name", "numberOfSubscribers"},
-                new int[] {android.R.id.text1,
-                           android.R.id.text2});
+                new int[] {R.id.topic,
+                           R.id.numberOfSubscribers});
         
         listview.setAdapter(adapter);        
         
