@@ -15,12 +15,18 @@
  */
 package com.google.android.gcm.demo.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.R.bool;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +34,9 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Handling of GCM messages.
@@ -37,7 +46,15 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
-    Context ctx;
+    Context ctx;    
+    
+    public List<Topics> topicForNotification = new ArrayList<Topics>();
+    
+    class Topics {
+    	String topicName;
+    	Integer Quantity;
+    	Integer NotificationId;
+    }
     
     class PushNotificationServiceResult
     {    	
@@ -66,19 +83,64 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
     private void sendNotification(Bundle msg) {
     	Log.v(TAG, "mesage: " + msg);
         mNotificationManager = (NotificationManager)
-                ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                ctx.getSystemService(Context.NOTIFICATION_SERVICE);        
+        
+        Topics topics = new Topics();
+        Topics Lasttopic = new Topics();
+        
+        SharedPreferences prefs = ctx.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        String value = prefs.getString("topicForNotification", null);
+
+        GsonBuilder gsonb = new GsonBuilder();
+        Gson gson = gsonb.create();
+        //Topics[] topicForNotification = gson.fromJson(value, Topics[].class);
+        
+        List<Topics> topicForNotification = gson.fromJson(value, new TypeToken<List<Topics>>(){}.getType());
                 
-        String topic = msg.getString("topic");
-        String nmessages = msg.getString("newMessages");
+        topics.topicName = msg.getString("topic");
+        topics.Quantity = Integer.parseInt(msg.getString("newMessages"));
+                
+        Boolean exists = false;
+        
+        if(topicForNotification != null){
+	        for(Topics t : topicForNotification){        	
+	        	if(t.topicName == topics.topicName){        		
+	        		t.Quantity = t.Quantity + topics.Quantity;
+	        		topics.NotificationId = t.NotificationId;
+	        		exists = true;
+	        	}
+	        	Lasttopic = t;
+	        }
+        }
+        else{
+        	topicForNotification = new ArrayList<Topics>();
+        }
+        
+        if(!exists){
+        	if(Lasttopic.NotificationId != null)
+        	{
+        		topics.NotificationId = Lasttopic.NotificationId + 1 ;
+        	}else{
+        		topics.NotificationId = 1;
+        	}       
+        	
+        	topicForNotification.add(topics);
+        }
+        
+        value = gson.toJson(topicForNotification);
+    	prefs = ctx.getSharedPreferences("settings", Context.MODE_PRIVATE);
+    	Editor e = prefs.edit();
+    	e.putString("topicForNotification", value);
+    	e.commit();
         
         Intent mIntent = new Intent(ctx, TopicFeedActivity.class);
-        mIntent.putExtra("FeedName", topic); 
+        mIntent.putExtra("FeedName", topics.topicName); 
 
 
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
         		mIntent, 0);
         
-        String message = "There are " + nmessages + " new alerts for " + topic;
+        String message = "There are " + topics.Quantity + " new alerts for " + topics.topicName;
         
         Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
               
@@ -95,6 +157,6 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
         
 
         mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        mNotificationManager.notify(topics.NotificationId, mBuilder.build());
     }
 }
